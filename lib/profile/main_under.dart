@@ -13,27 +13,43 @@ class _MainUnderState extends State<MainUnder> {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              width: 100,
+              margin: EdgeInsets.only(left: 10, top: 20),
+              width: 150,
               height: 100,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black),
+                border: Border.all(color: Colors.red, width: 2),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.person),
+                  Text('Voucher'),
+                ],
               ),
             ),
             Container(
-              width: 100,
+              margin: EdgeInsets.only(right: 10, top: 20),
+              width: 150,
               height: 100,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(10),                
+                border: Border.all(color: Colors.red, width: 2)
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.delivery_dining),
+                  Text('Đơn hàng'),
+                ],
               ),
             ),
           ],
         ),
         Container(
-              width: 100,
+          margin: EdgeInsets.only(top: 20),
+              width: 340,
               height: 100,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -41,8 +57,9 @@ class _MainUnderState extends State<MainUnder> {
               ),
             ),
         Container(
-              width: 100,
-              height: 100,
+          margin: EdgeInsets.only(top: 20),
+              width: 340,
+              height:150,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.black),
