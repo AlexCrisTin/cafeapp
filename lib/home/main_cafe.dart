@@ -5,6 +5,7 @@ import 'package:cafeproject/home/bottom_page.dart';
 import 'package:cafeproject/menu/menu_head.dart';
 import 'package:cafeproject/search/search_page.dart';
 import 'package:cafeproject/profile/profile_page.dart';
+import 'package:cafeproject/home/message_page.dart';
 
 class MainCafe extends StatefulWidget {
   const MainCafe({super.key});
@@ -75,13 +76,20 @@ class _MyWidgetState extends State<MainCafe> {
                           subtitle: Text('Welcome to Cafe', style: TextStyle(color: Colors.white),),
                         ),
                       ),
-                      Container(
-                        width: 45,
-                        height: 45,
-                        child: Icon(Icons.message, color: Colors.white, size: 20,),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Color(0xFFFB959F)
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const MessagePage()),
+                          );
+                        },
+                        child: Container(
+                          width: 45,
+                          height: 45,
+                          child: Icon(Icons.message, color: Colors.white, size: 20,),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Color(0xFFFB959F)
+                          ),
                         ),
                       )
                     ],
