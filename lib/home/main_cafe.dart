@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/home/page_cafe.dart';
 import 'package:cafeproject/home/item.dart';
 import 'package:cafeproject/home/bottom_page.dart';
-import 'package:cafeproject/menu/menu_page.dart';
+import 'package:cafeproject/menu/menu_head.dart';
 import 'package:cafeproject/search/search_page.dart';
 import 'package:cafeproject/profile/profile_page.dart';
 
@@ -93,7 +93,7 @@ class _MyWidgetState extends State<MainCafe> {
             ],
           ),
           // Tab 1: Menu
-          MenuPage(),
+          MenuHead(),
           // Tab 2: Search
           SearchPage(),
           // Tab 3: Profile
