@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:cafeproject/data/cart_service.dart';
+import 'package:cafeproject/home/checkout_page.dart';
 
-class ShoppingPage extends StatelessWidget {
+class ShoppingPage extends StatefulWidget {
   const ShoppingPage({super.key});
+
+  @override
+  State<ShoppingPage> createState() => _ShoppingPageState();
+}
+
+class _ShoppingPageState extends State<ShoppingPage> {
+  void _refresh() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +25,16 @@ class ShoppingPage extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: ListView(
-                children: [
-                  _buildCartItem('Cà phê đen', '25.000 VNĐ', 'assets/img/coffee1.png'),
-                  _buildCartItem('Cà phê sữa', '30.000 VNĐ', 'assets/img/coffee1.png'),
-                  _buildCartItem('Trà sữa', '35.000 VNĐ', 'assets/img/coffee1.png'),
-                ],
-              ),
+              child: CartService.items.isEmpty
+                  ? Center(child: Text('Giỏ hàng trống'))
+                  : ListView.separated(
+                      itemCount: CartService.items.length,
+                      separatorBuilder: (_, __) => SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final item = CartService.items[index];
+                        return _buildCartItem(item);
+                      },
+                    ),
             ),
             Container(
               padding: EdgeInsets.all(16),
@@ -43,7 +55,7 @@ class ShoppingPage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '90.000 VNĐ',
+                        _formatPrice(CartService.totalPrice),
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -57,8 +69,14 @@ class ShoppingPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Đặt hàng thành công!')),
+                        if (CartService.items.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Giỏ hàng trống')),
+                          );
+                          return;
+                        }
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const CheckoutPage()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -81,7 +99,15 @@ class ShoppingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCartItem(String name, String price, String imagePath) {
+  String _formatPrice(double price) {
+    final intValue = price.toInt();
+    final formatted = intValue
+        .toString()
+        .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    return '$formatted VNĐ';
+  }
+
+  Widget _buildCartItem(CartItem item) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(12),
@@ -114,7 +140,7 @@ class ShoppingPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  item.product.name,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -122,7 +148,7 @@ class ShoppingPage extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  price,
+                  _formatPrice(item.product.price),
                   style: TextStyle(
                     fontSize: 14,
                     color: Color(0xFFDC586D),
@@ -135,15 +161,29 @@ class ShoppingPage extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  CartService.decreaseQuantity(item.product.id);
+                  _refresh();
+                },
                 icon: Icon(Icons.remove_circle_outline),
                 color: Colors.grey,
               ),
-              Text('1', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('${item.quantity}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  CartService.increaseQuantity(item.product.id);
+                  _refresh();
+                },
                 icon: Icon(Icons.add_circle_outline),
                 color: Color(0xFFDC586D),
+              ),
+              IconButton(
+                onPressed: () {
+                  CartService.removeFromCart(item.product.id);
+                  _refresh();
+                },
+                icon: Icon(Icons.delete_outline),
+                color: Colors.grey,
               ),
             ],
           ),

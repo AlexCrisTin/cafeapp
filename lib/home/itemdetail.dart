@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/data/product_data.dart';
+import 'package:cafeproject/data/cart_service.dart';
 
 class ItemDetailPage extends StatelessWidget {
   final Product product;
@@ -85,6 +86,7 @@ class ItemDetailPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
+                  CartService.addToCart(product);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Đã thêm ${product.name} vào giỏ hàng!')),
                   );

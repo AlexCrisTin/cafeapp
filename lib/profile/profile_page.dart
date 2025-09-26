@@ -13,7 +13,7 @@ class ProfilePage extends StatelessWidget {
             color: Colors.red,
             height: 200,
           ),
-          MainUnder(),
+          Expanded(child: MainUnder()),
         ],
       ),
     );
