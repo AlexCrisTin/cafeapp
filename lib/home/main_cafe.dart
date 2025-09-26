@@ -72,7 +72,7 @@ class _MyWidgetState extends State<MainCafe> {
                       children: [
                         Expanded(
                           child: ListTile(
-                            leading: Icon(Icons.account_box_rounded),
+                            leading: Icon(Icons.person_2_outlined, size: 30, color: Colors.white),
                             title: Text('Chào mừng bạn đến với Cafe', style: TextStyle(color: Colors.white),),
                             subtitle: Text('Welcome to Cafe', style: TextStyle(color: Colors.white),),
                           ),

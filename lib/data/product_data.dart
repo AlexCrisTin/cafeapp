@@ -23,7 +23,7 @@ class ProductData {
       name: 'Cà phê đen',
       description: 'Cà phê đen truyền thống, đậm đà và thơm ngon. Pha từ hạt cà phê Robusta chất lượng cao.',
       price: 25000,
-      imagePath: 'assets/img/coffee1.png',
+      imagePath: 'assets/img/Ca-Phe-Den-scaled.jpg',
       category: 'Cafe',
     ),
     Product(
@@ -31,7 +31,7 @@ class ProductData {
       name: 'Cà phê sữa',
       description: 'Cà phê sữa ngọt ngào, kết hợp hoàn hảo giữa vị đắng của cà phê và vị ngọt của sữa.',
       price: 30000,
-      imagePath: 'assets/img/coffee1.png',
+      imagePath: 'assets/img/ca_phe_sua.png',
       category: 'Cafe',
     ),
     Product(
@@ -39,7 +39,7 @@ class ProductData {
       name: 'Trà sữa trân châu',
       description: 'Trà sữa thơm ngon với trân châu dai dai, một thức uống yêu thích của giới trẻ.',
       price: 35000,
-      imagePath: 'assets/img/coffee1.png',
+      imagePath: 'assets/img/Tra_sua.jpg',
       category: 'Trà sữa',
     ),
     Product(
@@ -47,7 +47,7 @@ class ProductData {
       name: 'Bánh mì sandwich',
       description: 'Bánh mì sandwich tươi ngon với thịt nguội, rau xanh và sốt mayonnaise.',
       price: 40000,
-      imagePath: 'assets/img/coffee1.png',
+      imagePath: 'assets/img/banh-mi-thit-sai-gon.jpg',
       category: 'Đồ ăn ngọt',
     ),
     Product(
@@ -55,7 +55,7 @@ class ProductData {
       name: 'Bánh ngọt',
       description: 'Bánh ngọt tươi ngon, được làm từ nguyên liệu cao cấp, thích hợp cho bữa sáng.',
       price: 20000,
-      imagePath: 'assets/img/coffee1.png',
+      imagePath: 'assets/img/banh-ngot-1.jpeg',
       category: 'Đồ ăn ngọt',
     ),
     Product(
@@ -63,7 +63,7 @@ class ProductData {
       name: 'Xúc xích',
       description: 'Bánh ngọt tươi ngon, được làm từ nguyên liệu cao cấp, thích hợp cho bữa sáng.',
       price: 20000,
-      imagePath: 'assets/img/coffee1.png',
+      imagePath: 'assets/img/',
       category: 'Đồ ăn mặn',
     ),
     Product(
@@ -71,7 +71,7 @@ class ProductData {
       name: 'Matcha',
       description: 'Bánh ngọt tươi ngon, được làm từ nguyên liệu cao cấp, thích hợp cho bữa sáng.',
       price: 20000,
-      imagePath: 'assets/img/coffee1.png',
+      imagePath: 'assets/img/',
       category: 'Matcha',
     ),
   ];

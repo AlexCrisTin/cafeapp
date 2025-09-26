@@ -27,10 +27,18 @@ class ItemDetailPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.redAccent),
                 color: Colors.grey[200],
+                image: product.imagePath.trim().isNotEmpty
+                    ? DecorationImage(
+                        image: AssetImage(product.imagePath),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
-              child: Center(
-                child: Icon(Icons.image, size: 50, color: Colors.grey),
-              ),
+              child: product.imagePath.trim().isNotEmpty
+                  ? null
+                  : Center(
+                      child: Icon(Icons.image, size: 50, color: Colors.grey),
+                    ),
             ),
             SizedBox(height: 20),
             Text(

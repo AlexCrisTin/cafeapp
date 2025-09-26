@@ -15,9 +15,10 @@ class _ItemState extends State<Item> {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.only(top: 10),
-          child: Text('Item 1'),
-          color: Colors.red,
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.only(top: 10, left: 10),
+          child: Text('Gợi ý cho bạn', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+          
         ),
         item1(productId: '1'),
         item1(productId: '2'),
@@ -65,13 +66,20 @@ class _item1State extends State<item1> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.redAccent),
+                    color: Colors.white,
+                    image: product != null
+                        ? DecorationImage(
+                            image: AssetImage(product.imagePath),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                   ),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 10),
                   height: 100,
                   width: 280,
-                  color: Colors.blue,
+                  color: Colors.white,
                   child: Column(
                     children: [
                       Text(product?.name ?? 'Sản phẩm'),
