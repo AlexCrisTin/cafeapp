@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cafeproject/menu/snack_page.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -14,12 +15,16 @@ class _MenuPageState extends State<MenuPage> {
       children: [
         Container(
           margin: EdgeInsets.only(right: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(onPressed: () {}, 
-              child: Row(children: [Text('Đồ ăn vặt', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),), Icon(Icons.arrow_right_alt, size: 20,)]),),
-            ],
+          child: InkWell(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => SnackPage()));
+                }, 
+                child: Row(children: [Text('Đồ ăn vặt', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),), Icon(Icons.arrow_right_alt, size: 20,)]),),
+              ],
+            ),
           ),
         ),
         Container(
@@ -43,7 +48,8 @@ class _MenuPageState extends State<MenuPage> {
               )
             ],
           ),
-        ),Container(
+        ),
+        Container(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -65,7 +71,8 @@ class _MenuPageState extends State<MenuPage> {
               )
             ],
           ),
-        ),Container(
+        ),
+        Container(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [

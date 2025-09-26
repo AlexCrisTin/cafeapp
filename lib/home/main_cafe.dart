@@ -57,54 +57,53 @@ class _MyWidgetState extends State<MainCafe> {
         },
         children: [
           // Tab 0: Home
-          Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Color(0xFFDC586D),
-                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
-                ),
-                child: Container(
-                  margin: EdgeInsets.only(top: 20),
-                  padding: EdgeInsets.only(left: 10, right: 20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ListTile(
-                          leading: Icon(Icons.account_box_rounded),
-                          title: Text('Chào mừng bạn đến với Cafe', style: TextStyle(color: Colors.white),),
-                          subtitle: Text('Welcome to Cafe', style: TextStyle(color: Colors.white),),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const MessagePage()),
-                          );
-                        },
-                        child: Container(
-                          width: 45,
-                          height: 45,
-                          child: Icon(Icons.message, color: Colors.white, size: 20,),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Color(0xFFFB959F)
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFDC586D),
+                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+                  ),
+                  child: Container(
+                    margin: EdgeInsets.only(top: 20),
+                    padding: EdgeInsets.only(left: 10, right: 20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ListTile(
+                            leading: Icon(Icons.account_box_rounded),
+                            title: Text('Chào mừng bạn đến với Cafe', style: TextStyle(color: Colors.white),),
+                            subtitle: Text('Welcome to Cafe', style: TextStyle(color: Colors.white),),
                           ),
                         ),
-                      )
-                    ],
+                        InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const MessagePage()),
+                            );
+                          },
+                          child: Container(
+                            width: 45,
+                            height: 45,
+                            child: Icon(Icons.message, color: Colors.white, size: 20,),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Color(0xFFFB959F)
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              PageCafe(),
-              Item()
-            ],
+                PageCafe(),
+                Item()
+              ],
+            ),
           ),
-          // Tab 1: Menu
-          MenuHead(),
-          // Tab 2: Search
+          SingleChildScrollView(child: MenuHead()),
           SearchPage(),
-          // Tab 3: Profile
           ProfilePage(),
         ],
       ),
