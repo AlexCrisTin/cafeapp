@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/profile/orders_page.dart';
-
+import 'package:cafeproject/setting/setting.dart';
 class MainUnder extends StatefulWidget {
   const MainUnder({super.key});
 
@@ -112,9 +112,16 @@ class _MainUnderState extends State<MainUnder> {
                     leading: Icon(Icons.ac_unit, size: 20,),
                     title: Text('Thông tin cá nhân', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                   ),
-                  ListTile(
-                    leading: Icon(Icons.ac_unit, size: 20,),
-                    title: Text('Cài đặt', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const SettingPage()),
+                      );
+                    },
+                    child: ListTile(
+                      leading: Icon(Icons.ac_unit, size: 20,),
+                      title: Text('Cài đặt', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                    ),
                   ),
                 ],
               ),

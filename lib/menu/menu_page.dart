@@ -15,17 +15,63 @@ class _MenuPageState extends State<MenuPage> {
       children: [
         Container(
           margin: EdgeInsets.only(right: 10),
-          child: InkWell(
+          child: Container(
+            
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => SnackPage()));
-                }, 
-                child: Row(children: [Text('Đồ ăn vặt', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),), Icon(Icons.arrow_right_alt, size: 20,)]),),
-              ],
-            ),
-          ),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.red),
+                  ),
+                  child: Icon(Icons.coffee, size: 20,),
+                ),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.red),
+                  ),
+                  child: Icon(Icons.coffee, size: 20,),
+                ),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.red),
+                  ),
+                  child: Icon(Icons.coffee, size: 20,),              
+                ),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.red),
+                  ),
+                  child: Icon(Icons.coffee, size: 20,),
+                ),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.red),
+                  ),
+                  child: Icon(Icons.coffee, size: 20,),
+                ),
+              ]
+            )
+          )
         ),
         Container(
           child: Row(

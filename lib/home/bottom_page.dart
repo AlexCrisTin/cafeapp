@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:cafeproject/home/shopping_page.dart';
 class BottomPage extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -24,13 +24,52 @@ class BottomPage extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Stack(
         children: [
-          _buildNavItem(Icons.home, 0, 'Home'),
-          _buildNavItem(Icons.menu, 1, 'Menu'),
-          _buildNavItem(Icons.search, 2, 'Search'),
-          _buildNavItem(Icons.person, 3, 'Profile'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(Icons.home, 0, 'Home'),
+              _buildNavItem(Icons.menu, 1, 'Menu'),
+              _buildNavItem(Icons.search, 2, 'Search'),
+              _buildNavItem(Icons.person, 3, 'Profile'),
+            ],
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: -15,
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ShoppingPage()),
+                  );
+                },
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFDC586D),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.shopping_cart,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

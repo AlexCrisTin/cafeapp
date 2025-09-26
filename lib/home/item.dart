@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cafeproject/data/product_data.dart';
+import 'package:cafeproject/home/itemdetail.dart';
 
 class Item extends StatefulWidget {
   const Item({super.key});
@@ -17,17 +19,19 @@ class _ItemState extends State<Item> {
           child: Text('Item 1'),
           color: Colors.red,
         ),
-        item1(),
-        item1(),
-        item1(),  
-        item1(),
-        item1(),
+        item1(productId: '1'),
+        item1(productId: '2'),
+        item1(productId: '3'),  
+        item1(productId: '4'),
+        item1(productId: '5'),
       ],
     );
   }
 }
 class item1 extends StatefulWidget {
-  const item1({super.key});
+  final String productId;
+
+  const item1({super.key, required this.productId});
 
   @override
   State<item1> createState() => _item1State();
@@ -36,37 +40,52 @@ class item1 extends StatefulWidget {
 class _item1State extends State<item1> {
   @override
   Widget build(BuildContext context) {
+    final product = ProductData.getProductById(widget.productId);
     return Column(
       children: [
-        Container(
-          child: Row(
-            children: [
-              Container(
-                margin: EdgeInsets.only(left: 10, top: 10),
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.redAccent),
+        InkWell(
+          onTap: () {
+            if (product != null) {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => ItemDetailPage(product: product)),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Không tìm thấy sản phẩm')),
+              );
+            }
+          },
+          child: Container(
+            child: Row(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(left: 10, top: 10),
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.redAccent),
+                  ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 10),
-                height: 100,
-                width: 280,
-                color: Colors.blue,
-                child: Column(
-                  children: [
-                    Text('Item 2'),
-                    Text('Item 3'),
-                    Text('Item 4'),
-                  ],
-                ),
-              )
-            ],
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  height: 100,
+                  width: 280,
+                  color: Colors.blue,
+                  child: Column(
+                    children: [
+                      Text(product?.name ?? 'Sản phẩm'),
+                      Text(product?.category ?? ''),
+                      Text(product != null ? product.price.toStringAsFixed(0) + ' đ' : ''),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ],
     );
   }
 }
+
