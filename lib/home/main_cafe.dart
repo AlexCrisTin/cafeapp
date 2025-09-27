@@ -6,6 +6,7 @@ import 'package:cafeproject/menu/menu_head.dart';
 import 'package:cafeproject/search/search_page.dart';
 import 'package:cafeproject/profile/profile_page.dart';
 import 'package:cafeproject/home/message_page.dart';
+import 'package:cafeproject/home/mostbuy.dart';
 
 class MainCafe extends StatefulWidget {
   const MainCafe({super.key});
@@ -98,7 +99,8 @@ class _MyWidgetState extends State<MainCafe> {
                   ),
                 ),
                 PageCafe(),
-                Item()
+                Item(),
+                Mostbuy()
               ],
             ),
           ),

@@ -39,9 +39,9 @@ class OrderDetailPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final it = order.items[index];
                   return ListTile(
-                    title: Text(it.product.name),
+                    title: Text(it.product.name + (it.selectedSize != null ? ' (${it.selectedSize})' : '')),
                     subtitle: Text('x${it.quantity}'),
-                    trailing: Text(_formatPrice(it.product.price * it.quantity)),
+                    trailing: Text(_formatPrice(it.totalPrice)),
                   );
                 },
               ),

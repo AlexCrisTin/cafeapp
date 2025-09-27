@@ -6,8 +6,16 @@ enum OrderStatus { pending, completed }
 class OrderItem {
   final Product product;
   final int quantity;
+  final String? selectedSize;
 
-  OrderItem({required this.product, required this.quantity});
+  OrderItem({required this.product, required this.quantity, this.selectedSize});
+
+  double get totalPrice {
+    if (selectedSize != null && product.hasSize) {
+      return product.getPriceForSize(selectedSize!) * quantity;
+    }
+    return product.price * quantity;
+  }
 }
 
 class Order {
@@ -30,7 +38,7 @@ class Order {
   });
 
   double get totalPrice => items
-      .fold(0.0, (sum, it) => sum + (it.product.price * it.quantity));
+      .fold(0.0, (sum, it) => sum + it.totalPrice);
 }
 
 class OrdersService {
@@ -52,7 +60,7 @@ class OrdersService {
       address: address,
       paymentMethod: payment,
       items: cartItems
-          .map((ci) => OrderItem(product: ci.product, quantity: ci.quantity))
+          .map((ci) => OrderItem(product: ci.product, quantity: ci.quantity, selectedSize: ci.selectedSize))
           .toList(),
     );
     _orders.add(order);

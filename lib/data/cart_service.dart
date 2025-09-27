@@ -3,8 +3,16 @@ import 'package:cafeproject/data/product_data.dart';
 class CartItem {
   final Product product;
   int quantity;
+  final String? selectedSize;
 
-  CartItem({required this.product, this.quantity = 1});
+  CartItem({required this.product, this.quantity = 1, this.selectedSize});
+
+  double get totalPrice {
+    if (selectedSize != null && product.hasSize) {
+      return product.getPriceForSize(selectedSize!) * quantity;
+    }
+    return product.price * quantity;
+  }
 }
 
 class CartService {
@@ -12,12 +20,13 @@ class CartService {
 
   static List<CartItem> get items => List.unmodifiable(_items);
 
-  static void addToCart(Product product, {int quantity = 1}) {
-    final index = _items.indexWhere((it) => it.product.id == product.id);
+  static void addToCart(Product product, {int quantity = 1, String? selectedSize}) {
+    final index = _items.indexWhere((it) => 
+      it.product.id == product.id && it.selectedSize == selectedSize);
     if (index >= 0) {
       _items[index].quantity += quantity;
     } else {
-      _items.add(CartItem(product: product, quantity: quantity));
+      _items.add(CartItem(product: product, quantity: quantity, selectedSize: selectedSize));
     }
   }
 
@@ -48,7 +57,7 @@ class CartService {
 
   static int get totalQuantity => _items.fold(0, (sum, it) => sum + it.quantity);
 
-  static double get totalPrice => _items.fold(0.0, (sum, it) => sum + it.product.price * it.quantity);
+  static double get totalPrice => _items.fold(0.0, (sum, it) => sum + it.totalPrice);
 
   static void clear() {
     _items.clear();

@@ -5,6 +5,8 @@ class Product {
   final double price;
   final String imagePath;
   final String category;
+  final bool hasSize;
+  final Map<String, double>? sizePrices;
 
   Product({
     required this.id,
@@ -13,7 +15,14 @@ class Product {
     required this.price,
     required this.imagePath,
     required this.category,
+    this.hasSize = false,
+    this.sizePrices,
   });
+
+  double getPriceForSize(String size) {
+    if (!hasSize || sizePrices == null) return price;
+    return sizePrices![size] ?? price;
+  }
 }
 
 class ProductData {
@@ -25,6 +34,8 @@ class ProductData {
       price: 25000,
       imagePath: 'assets/img/Ca-Phe-Den-scaled.jpg',
       category: 'Cafe',
+      hasSize: true,
+      sizePrices: {'S': 25000, 'M': 30000, 'L': 35000},
     ),
     Product(
       id: '2',
@@ -33,6 +44,8 @@ class ProductData {
       price: 30000,
       imagePath: 'assets/img/ca_phe_sua.png',
       category: 'Cafe',
+      hasSize: true,
+      sizePrices: {'S': 30000, 'M': 35000, 'L': 40000},
     ),
     Product(
       id: '3',
@@ -41,6 +54,8 @@ class ProductData {
       price: 35000,
       imagePath: 'assets/img/Tra_sua.jpg',
       category: 'Trà sữa',
+      hasSize: true,
+      sizePrices: {'S': 35000, 'M': 40000, 'L': 45000},
     ),
     Product(
       id: '4',
@@ -73,6 +88,8 @@ class ProductData {
       price: 20000,
       imagePath: 'assets/img/Matcha.jpg',
       category: 'Matcha',
+      hasSize: true,
+      sizePrices: {'S': 20000, 'M': 25000, 'L': 30000},
     ),
   ];
 

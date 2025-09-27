@@ -2,10 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/data/product_data.dart';
 import 'package:cafeproject/data/cart_service.dart';
 
-class ItemDetailPage extends StatelessWidget {
+class ItemDetailPage extends StatefulWidget {
   final Product product;
   
   const ItemDetailPage({super.key, required this.product});
+
+  @override
+  State<ItemDetailPage> createState() => _ItemDetailPageState();
+}
+
+class _ItemDetailPageState extends State<ItemDetailPage> {
+  String? selectedSize;
+
+  double _getCurrentPrice() {
+    if (selectedSize != null && widget.product.hasSize) {
+      return widget.product.getPriceForSize(selectedSize!);
+    }
+    return widget.product.price;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +41,14 @@ class ItemDetailPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.redAccent),
                 color: Colors.grey[200],
-                image: product.imagePath.trim().isNotEmpty
+                image: widget.product.imagePath.trim().isNotEmpty
                     ? DecorationImage(
-                        image: AssetImage(product.imagePath),
+                        image: AssetImage(widget.product.imagePath),
                         fit: BoxFit.cover,
                       )
                     : null,
               ),
-              child: product.imagePath.trim().isNotEmpty
+              child: widget.product.imagePath.trim().isNotEmpty
                   ? null
                   : Center(
                       child: Icon(Icons.image, size: 50, color: Colors.grey),
@@ -42,7 +56,7 @@ class ItemDetailPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Text(
-              product.name,
+              widget.product.name,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -56,7 +70,7 @@ class ItemDetailPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                product.category,
+                widget.product.category,
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.blue[800],
@@ -66,13 +80,67 @@ class ItemDetailPage extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              product.description,
+              widget.product.description,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[600],
               ),
             ),
             SizedBox(height: 20),
+            // Size selection for drinks
+            if (widget.product.hasSize) ...[
+              Text(
+                'Chọn size:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Row(
+                children: ['S', 'M', 'L'].map((size) {
+                  final price = widget.product.getPriceForSize(size);
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedSize = size;
+                        });
+                      },
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 4),
+                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: selectedSize == size ? Colors.red : Colors.grey[200],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: selectedSize == size ? Colors.red : Colors.grey,
+                            width: 2,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              size,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: selectedSize == size ? Colors.white : Colors.black,
+                              ),
+                            ),
+                            Text(
+                              '${price.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}đ',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: selectedSize == size ? Colors.white : Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 20),
+            ],
             Row(
               children: [
                 Text(
@@ -80,7 +148,7 @@ class ItemDetailPage extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '${product.price.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} VNĐ',
+                  '${_getCurrentPrice().toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} VNĐ',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -94,9 +162,15 @@ class ItemDetailPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  CartService.addToCart(product);
+                  if (widget.product.hasSize && selectedSize == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Vui lòng chọn size!')),
+                    );
+                    return;
+                  }
+                  CartService.addToCart(widget.product, selectedSize: selectedSize);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Đã thêm ${product.name} vào giỏ hàng!')),
+                    SnackBar(content: Text('Đã thêm ${widget.product.name}${selectedSize != null ? ' ($selectedSize)' : ''} vào giỏ hàng!')),
                   );
                 },
                 style: ElevatedButton.styleFrom(

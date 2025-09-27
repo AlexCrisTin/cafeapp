@@ -23,8 +23,6 @@ class _ItemState extends State<Item> {
         item1(productId: '1'),
         item1(productId: '2'),
         item1(productId: '3'),  
-        item1(productId: '4'),
-        item1(productId: '5'),
       ],
     );
   }

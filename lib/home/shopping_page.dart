@@ -140,7 +140,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.product.name,
+                  item.product.name + (item.selectedSize != null ? ' (${item.selectedSize})' : ''),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -148,7 +148,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  _formatPrice(item.product.price),
+                  _formatPrice(item.totalPrice / item.quantity),
                   style: TextStyle(
                     fontSize: 14,
                     color: Color(0xFFDC586D),
