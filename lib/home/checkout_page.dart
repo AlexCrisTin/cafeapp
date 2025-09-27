@@ -151,7 +151,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               Container(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_nameController.text.trim().isEmpty ||
                         _phoneController.text.trim().isEmpty ||
                         _addressController.text.trim().isEmpty) {
@@ -160,14 +160,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       );
                       return;
                     }
-                    OrdersService.createOrder(
+                    await OrdersService.createOrder(
                       name: _nameController.text.trim(),
                       phone: _phoneController.text.trim(),
                       address: _addressController.text.trim(),
                       payment: _payment,
                       cartItems: CartService.items,
                     );
-                    CartService.clear();
+                    await CartService.clear();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const OrdersPage()),
                       (route) => route.isFirst,

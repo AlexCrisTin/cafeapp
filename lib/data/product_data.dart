@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+
 class Product {
   final String id;
   final String name;
@@ -23,10 +27,42 @@ class Product {
     if (!hasSize || sizePrices == null) return price;
     return sizePrices![size] ?? price;
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'price': price,
+      'imagePath': imagePath,
+      'category': category,
+      'hasSize': hasSize,
+      'sizePrices': sizePrices,
+    };
+  }
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      price: json['price'].toDouble(),
+      imagePath: json['imagePath'],
+      category: json['category'],
+      hasSize: json['hasSize'] ?? false,
+      sizePrices: json['sizePrices'] != null 
+          ? Map<String, double>.from(json['sizePrices'])
+          : null,
+    );
+  }
 }
 
 class ProductData {
-  static List<Product> products = [
+  static List<Product> products = [];
+  static const String _fileName = 'products_data.json';
+
+  // Dữ liệu sản phẩm mặc định
+  static final List<Product> _defaultProducts = [
     Product(
       id: '1',
       name: 'Cà phê đen',
@@ -92,6 +128,65 @@ class ProductData {
       sizePrices: {'S': 20000, 'M': 25000, 'L': 30000},
     ),
   ];
+
+  // Lưu dữ liệu vào file
+  static Future<void> _saveToFile() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$_fileName');
+      final jsonData = products.map((product) => product.toJson()).toList();
+      await file.writeAsString(jsonEncode(jsonData));
+    } catch (e) {
+      print('Lỗi khi lưu sản phẩm: $e');
+    }
+  }
+
+  // Đọc dữ liệu từ file
+  static Future<void> loadFromFile() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$_fileName');
+      
+      if (await file.exists()) {
+        final jsonString = await file.readAsString();
+        final List<dynamic> jsonData = jsonDecode(jsonString);
+        
+        products.clear();
+        for (var productJson in jsonData) {
+          products.add(Product.fromJson(productJson));
+        }
+      } else {
+        // Nếu file không tồn tại, khởi tạo với dữ liệu mặc định
+        products = List<Product>.from(_defaultProducts);
+        await _saveToFile();
+      }
+    } catch (e) {
+      print('Lỗi khi đọc sản phẩm: $e');
+      // Nếu có lỗi, khởi tạo với dữ liệu mặc định
+      products = List<Product>.from(_defaultProducts);
+    }
+  }
+
+  // Thêm sản phẩm mới
+  static Future<void> addProduct(Product product) async {
+    products.add(product);
+    await _saveToFile();
+  }
+
+  // Cập nhật sản phẩm
+  static Future<void> updateProduct(Product product) async {
+    final index = products.indexWhere((p) => p.id == product.id);
+    if (index >= 0) {
+      products[index] = product;
+      await _saveToFile();
+    }
+  }
+
+  // Xóa sản phẩm
+  static Future<void> deleteProduct(String productId) async {
+    products.removeWhere((p) => p.id == productId);
+    await _saveToFile();
+  }
 
   static Product? getProductById(String id) {
     try {

@@ -161,8 +161,8 @@ class _ShoppingPageState extends State<ShoppingPage> {
           Row(
             children: [
               IconButton(
-                onPressed: () {
-                  CartService.decreaseQuantity(item.product.id);
+                onPressed: () async {
+                  await CartService.decreaseQuantity(item.product.id);
                   _refresh();
                 },
                 icon: Icon(Icons.remove_circle_outline),
@@ -170,16 +170,16 @@ class _ShoppingPageState extends State<ShoppingPage> {
               ),
               Text('${item.quantity}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               IconButton(
-                onPressed: () {
-                  CartService.increaseQuantity(item.product.id);
+                onPressed: () async {
+                  await CartService.increaseQuantity(item.product.id);
                   _refresh();
                 },
                 icon: Icon(Icons.add_circle_outline),
                 color: Color(0xFFDC586D),
               ),
               IconButton(
-                onPressed: () {
-                  CartService.removeFromCart(item.product.id);
+                onPressed: () async {
+                  await CartService.removeFromCart(item.product.id);
                   _refresh();
                 },
                 icon: Icon(Icons.delete_outline),

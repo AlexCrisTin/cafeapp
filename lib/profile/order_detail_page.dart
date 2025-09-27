@@ -58,8 +58,8 @@ class OrderDetailPage extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  OrdersService.completeOrder(order.id);
+                onPressed: () async {
+                  await OrdersService.completeOrder(order.id);
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (_) => const OrderSuccessPage()),
                   );

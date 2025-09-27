@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/profile/orders_page.dart';
 import 'package:cafeproject/setting/setting.dart';
+import 'package:cafeproject/login/begin.dart';
 class MainUnder extends StatefulWidget {
   const MainUnder({super.key});
 
@@ -9,6 +10,45 @@ class MainUnder extends StatefulWidget {
 }
 
 class _MainUnderState extends State<MainUnder> {
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Đăng xuất'),
+          content: Text('Bạn có chắc chắn muốn đăng xuất?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Đóng dialog
+              },
+              child: Text('Hủy', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Đóng dialog
+                // Xóa tất cả dữ liệu và quay về trang đăng nhập
+                _performLogout(context);
+              },
+              child: Text('Đăng xuất', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _performLogout(BuildContext context) async {
+    // Có thể thêm logic xóa dữ liệu user ở đây nếu cần
+    // Ví dụ: xóa token, clear cache, etc.
+    
+    // Quay về trang Begin (trang đăng nhập)
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => Begin()),
+      (route) => false, // Xóa tất cả route trước đó
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -127,9 +167,40 @@ class _MainUnderState extends State<MainUnder> {
                   ],
                 ),
               ),
+          // Container Logout
+          Container(
+            margin: EdgeInsets.only(top: 20),
+            width: 340,
+            height: 60,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.red, width: 2),
+              color: Colors.red[50],
+            ),
+            child: InkWell(
+              onTap: () {
+                _showLogoutDialog(context);
+              },
+              borderRadius: BorderRadius.circular(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.logout, color: Colors.red, size: 24),
+                  SizedBox(width: 10),
+                  Text(
+                    'Đăng xuất',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
-      
     );
   }
 }

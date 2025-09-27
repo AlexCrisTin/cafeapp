@@ -161,14 +161,14 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
             Container(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (widget.product.hasSize && selectedSize == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Vui lòng chọn size!')),
                     );
                     return;
                   }
-                  CartService.addToCart(widget.product, selectedSize: selectedSize);
+                  await CartService.addToCart(widget.product, selectedSize: selectedSize);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Đã thêm ${widget.product.name}${selectedSize != null ? ' ($selectedSize)' : ''} vào giỏ hàng!')),
                   );
