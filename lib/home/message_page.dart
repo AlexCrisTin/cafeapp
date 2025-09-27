@@ -10,7 +10,7 @@ class MessagePage extends StatelessWidget {
         title: const Text('Messages'),
       ),
       body: const Center(
-        child: Text('This is a new page'),
+        child: Text('Không có tin nhắn'),
       ),
     );
   }

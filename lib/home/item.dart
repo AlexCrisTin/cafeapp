@@ -50,11 +50,7 @@ class _item1State extends State<item1> {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => ItemDetailPage(product: product)),
               );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Không tìm thấy sản phẩm')),
-              );
-            }
+            } 
           },
           child: Container(
             child: Row(
@@ -65,7 +61,7 @@ class _item1State extends State<item1> {
                   height: 100,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.redAccent),
+                    border: Border.all(color: Colors.redAccent, width: 3),
                     color: Colors.white,
                     image: product != null
                         ? DecorationImage(
@@ -76,10 +72,13 @@ class _item1State extends State<item1> {
                   ),
                 ),
                 Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   margin: EdgeInsets.only(top: 10),
                   height: 100,
-                  width: 280,
-                  color: Colors.white,
+                  width: 280,                 
                   child: Column(
                     children: [
                       Text(product?.name ?? 'Sản phẩm'),

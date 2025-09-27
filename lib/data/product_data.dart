@@ -61,17 +61,17 @@ class ProductData {
     Product(
       id: '6',
       name: 'Xúc xích',
-      description: 'Bánh ngọt tươi ngon, được làm từ nguyên liệu cao cấp, thích hợp cho bữa sáng.',
+      description: 'Xúc xích tươi ngon, được làm từ nguyên liệu cao cấp, thích hợp cho ăn vặt.',
       price: 20000,
-      imagePath: 'assets/img/',
+      imagePath: 'assets/img/xuc_xich.jpg',
       category: 'Đồ ăn mặn',
     ),
     Product(
       id: '7',
       name: 'Matcha',
-      description: 'Bánh ngọt tươi ngon, được làm từ nguyên liệu cao cấp, thích hợp cho bữa sáng.',
+      description: 'Matcha ngọt ngào, kết hợp hoàn hảo giữa vị đắng của trà và vị ngọt của sữa',
       price: 20000,
-      imagePath: 'assets/img/',
+      imagePath: 'assets/img/Matcha.jpg',
       category: 'Matcha',
     ),
   ];

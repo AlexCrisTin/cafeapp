@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/data/product_data.dart';
 import 'package:cafeproject/home/itemdetail.dart';
 import 'package:cafeproject/menu/category_products_page.dart';
-
+import 'package:cafeproject/home/item.dart';
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
 
@@ -30,6 +30,8 @@ class _MenuPageState extends State<MenuPage> {
         Container(
           margin: EdgeInsets.only(right: 10),
           child: Container(
+            color: Colors.white,
+            width: double.infinity,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -132,89 +134,20 @@ class _MenuPageState extends State<MenuPage> {
             )
           )
         ),
+
         Container(
-          child: Row(
+          child: Column(
             children: [
-              InkWell(
-                onTap: () => _openProduct(context, '1'),
-                child: Container(
-                width: 100,
-                height: 100,
-               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red),
-               ),
-               ),
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(top: 10, left: 10),
+                child: Text('Gợi ý cho bạn', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
               ),
-              InkWell(
-                onTap: () => _openProduct(context, '2'),
-                child: Container(
-                width: 100,
-                height: 100,
-               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red),
-               ),
-               ),
-              )
-            ],
-          ),
-        ),
-        Container(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              InkWell(
-                onTap: () => _openProduct(context, '3'),
-                child: Container(
-                width: 100,
-                height: 100,
-               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red),
-               ),
-               ),
-              ),
-              InkWell(
-                onTap: () => _openProduct(context, '4'),
-                child: Container(
-                width: 100,
-                height: 100,
-               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red),
-               ),
-               ),
-              )
-            ],
-          ),
-        ),
-        Container(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              InkWell(
-                onTap: () => _openProduct(context, '5'),
-                child: Container(
-                width: 100,
-                height: 100,
-               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red),
-               ),
-               ),
-              ),
-              InkWell(
-                onTap: () => _openProduct(context, '1'),
-                child: Container(
-                width: 100,
-                height: 100,
-               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red),
-               ),
-               ),
-              )
+              item1(productId: '1'),
+              item1(productId: '2'),
+              item1(productId: '3'),  
+              item1(productId: '4'),
+              item1(productId: '5'),
             ],
           ),
         )

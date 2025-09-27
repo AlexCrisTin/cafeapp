@@ -53,6 +53,8 @@ class _SearchPageState extends State<SearchPage> {
               TextField(
                 controller: _controller,
                 decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  filled: true,
                   hintText: 'Người đẹp muốn uống gì',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -84,7 +86,17 @@ class _SearchPageState extends State<SearchPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: Colors.redAccent),
+                                color: Colors.grey[200],
+                                image: product.imagePath.trim().isNotEmpty
+                                    ? DecorationImage(
+                                        image: AssetImage(product.imagePath),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
                               ),
+                              child: product.imagePath.trim().isNotEmpty
+                                  ? null
+                                  : Icon(Icons.image, size: 18, color: Colors.grey),
                             ),
                             title: Text(product.name),
                             subtitle: Text(product.category),
