@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/home/main_cafe.dart';
-import 'package:cafeproject/data/product_data.dart';
-import 'package:cafeproject/data/cart_service.dart';
-import 'package:cafeproject/data/orders_service.dart';
-import 'package:cafeproject/login/begin.dart';
+import 'package:cafeproject/database/data/product_data.dart';
+import 'package:cafeproject/database/data/cart_service.dart';
+import 'package:cafeproject/database/data/orders_service.dart';
+import 'package:cafeproject/database/auth/navigation_helper.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -37,10 +36,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Begin(),
+      home: AppRouter(),
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.grey[200],
       ),
     );
+  }
+}
+
+class AppRouter extends StatelessWidget {
+  const AppRouter({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return NavigationHelper.getHomePage();
   }
 }

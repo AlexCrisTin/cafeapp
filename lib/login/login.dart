@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/home/main_cafe.dart';
 import 'package:cafeproject/login/signup.dart';
 import 'package:cafeproject/login/begin.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
+import 'package:cafeproject/database/auth/navigation_helper.dart';
+import 'package:cafeproject/users/guest/guest_main.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -10,46 +13,121 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  String? _error;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'Email',
+      appBar: AppBar(
+        title: const Text('Đăng nhập'),
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_error != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  border: Border.all(color: Colors.red),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(_error!, style: const TextStyle(color: Colors.red)),
+              ),
+            ],
+            const Text(
+              'Thông tin đăng nhập',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-          ),
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'Password',
+            const SizedBox(height: 10),
+
+            const SizedBox(height: 20),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                hintText: 'admin@cafe.app',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.email),
+              ),
+              keyboardType: TextInputType.emailAddress,
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => MainCafe()));
-            },
-            child: Text('Login'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage()));
-            },
-            child: Text('Signup'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => MainCafe()));
-            },
-            child: Text('Guest'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Begin()));
-            },
-            child: Text('Back'),
-          ),
-        ],
+            const SizedBox(height: 16),
+            TextField(
+              controller: _passwordController,
+              decoration: const InputDecoration(
+                labelText: 'Mật khẩu',
+                hintText: 'Nhập mật khẩu',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.lock),
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  final email = _emailController.text.trim();
+                  final password = _passwordController.text;
+                  
+                  if (email.isEmpty || password.isEmpty) {
+                    setState(() { _error = 'Vui lòng nhập đầy đủ thông tin'; });
+                    return;
+                  }
+                  
+                  final ok = AuthService.instance.loginWithCredentials(email, password);
+                  if (!ok) {
+                    setState(() { _error = 'Email hoặc mật khẩu không đúng'; });
+                    return;
+                  }
+                  
+                  setState(() { _error = null; });
+                  NavigationHelper.navigateAfterLogin(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                ),
+                child: const Text('Đăng nhập', style: TextStyle(fontSize: 16)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage()));
+                  },
+                  child: const Text('Đăng ký'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    AuthService.instance.continueAsGuest();
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GuestMain()));
+                  },
+                  child: const Text('Khách'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Begin()));
+              },
+              child: const Text('Quay lại'),
+            ),
+          ],
+        ),
       ),
     );
   }
