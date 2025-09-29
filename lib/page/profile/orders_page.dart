@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/orders_service.dart';
-import 'package:cafeproject/allpage/profile/order_detail_page.dart';
+import 'package:cafeproject/page/profile/order_detail_page.dart';
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
@@ -14,9 +14,6 @@ class _OrdersPageState extends State<OrdersPage> {
   Widget build(BuildContext context) {
     final orders = OrdersService.orders.where((order) => order.status.name == 'pending').toList();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Đơn hàng'),
-      ),
       body: orders.isEmpty
           ? const Center(child: Text('Chưa có đơn hàng'))
           : ListView.separated(
@@ -34,7 +31,6 @@ class _OrdersPageState extends State<OrdersPage> {
                         builder: (_) => OrderDetailPage(order: order),
                       ),
                     );
-                    // Refresh the page when returning from order detail
                     setState(() {});
                   },
                 );

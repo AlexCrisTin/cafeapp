@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/allpage/home/page_cafe.dart';
-import 'package:cafeproject/allpage/home/item.dart';
-import 'package:cafeproject/allpage/home/mostbuy.dart';
+import 'package:cafeproject/page/home/page_cafe.dart';
+import 'package:cafeproject/page/home/item.dart';
+import 'package:cafeproject/page/home/mostbuy.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/login/begin.dart';
 

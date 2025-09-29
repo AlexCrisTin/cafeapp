@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/product_data.dart';
-import 'package:cafeproject/allpage/home/itemdetail.dart';
+import 'package:cafeproject/page/home/itemdetail.dart';
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
 

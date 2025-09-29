@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/orders_service.dart';
-import 'package:cafeproject/allpage/profile/order_success_page.dart';
+import 'package:cafeproject/page/profile/order_success_page.dart';
 
 class OrderDetailPage extends StatelessWidget {
   final Order order;

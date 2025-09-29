@@ -14,6 +14,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  bool _notificationsEnabled = true;
 
   @override
   void initState() {
@@ -23,8 +24,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   void _loadUserInfo() {
     _emailController.text = _auth.currentUser?.email ?? '';
-    _nameController.text = 'Người dùng'; // Default name
-    _phoneController.text = '0123456789'; // Default phone
+    _nameController.text = 'Người dùng'; 
+    _phoneController.text = '0123456789'; 
   }
 
   @override
@@ -37,7 +38,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   void _saveProfile() {
     if (_formKey.currentState!.validate()) {
-      // In a real app, you would save to backend here
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Thông tin đã được cập nhật'),
@@ -201,11 +201,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       title: Text('Thông báo'),
                       subtitle: Text('Nhận thông báo về đơn hàng'),
                       trailing: Switch(
-                        value: true,
+                        value: _notificationsEnabled,
                         onChanged: (value) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Cài đặt thông báo: $value')),
-                          );
+                          setState(() {
+                            _notificationsEnabled = value;
+                          });
                         },
                         activeColor: Color(0xFFDC586D),
                       ),

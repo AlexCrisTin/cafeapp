@@ -57,12 +57,12 @@ class _SignupPageState extends State<SignupPage> {
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
-                labelText: 'Email',
-                hintText: 'Nhập email của bạn',
+                labelText: 'Tên đăng nhập',
+                hintText: 'Nhập tên đăng nhập',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
+                prefixIcon: Icon(Icons.person),
               ),
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 16),
             TextField(

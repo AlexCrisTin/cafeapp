@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/users/guest/browse/guest_browse.dart';
 import 'package:cafeproject/users/guest/cart/guest_cart.dart';
-import 'package:cafeproject/allpage/menu/menu_head.dart';
-import 'package:cafeproject/allpage/search/search_page.dart';
+import 'package:cafeproject/page/menu/menu_head.dart';
+import 'package:cafeproject/page/search/search_page.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/login/begin.dart';
 

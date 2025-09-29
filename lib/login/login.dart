@@ -52,12 +52,12 @@ class _LoginPageState extends State<LoginPage> {
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
-                labelText: 'Email',
-                hintText: 'admin@cafe.app',
+                labelText: 'Tên đăng nhập',
+                hintText: 'Nhập tên đăng nhập',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
+                prefixIcon: Icon(Icons.person),
               ),
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 16),
             TextField(
