@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:cafeproject/database/data/product_data.dart';
+import 'package:cafeproject/users/admin/management/admin_users_page.dart';
 
-class AdminManagement extends StatelessWidget {
+class AdminManagement extends StatefulWidget {
   const AdminManagement({super.key});
 
+  @override
+  State<AdminManagement> createState() => _AdminManagementState();
+}
+
+class _AdminManagementState extends State<AdminManagement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,6 +17,13 @@ class AdminManagement extends StatelessWidget {
         title: Text('Quản lý hệ thống'),
         backgroundColor: Color(0xFFDC586D),
         foregroundColor: Colors.white,
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openProductForm(context),
+        backgroundColor: Color(0xFFDC586D),
+        foregroundColor: Colors.white,
+        icon: Icon(Icons.add),
+        label: Text('Thêm sản phẩm'),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20),
@@ -24,39 +38,7 @@ class AdminManagement extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            _buildManagementCard(
-              'Thêm sản phẩm mới',
-              'Tạo sản phẩm mới cho menu',
-              Icons.add_circle,
-              Colors.green,
-              () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Mở form thêm sản phẩm')),
-                );
-              },
-            ),
-            _buildManagementCard(
-              'Chỉnh sửa sản phẩm',
-              'Cập nhật thông tin sản phẩm',
-              Icons.edit,
-              Colors.blue,
-              () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Mở danh sách sản phẩm')),
-                );
-              },
-            ),
-            _buildManagementCard(
-              'Xóa sản phẩm',
-              'Loại bỏ sản phẩm khỏi menu',
-              Icons.delete,
-              Colors.red,
-              () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Mở danh sách sản phẩm để xóa')),
-                );
-              },
-            ),
+            _buildProductsTable(context),
 
             SizedBox(height: 30),
 
@@ -79,17 +61,7 @@ class AdminManagement extends StatelessWidget {
                 );
               },
             ),
-            _buildManagementCard(
-              'Đơn hàng chờ xử lý',
-              'Xử lý đơn hàng mới',
-              Icons.pending_actions,
-              Colors.amber,
-              () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Mở đơn hàng chờ xử lý')),
-                );
-              },
-            ),
+
 
             SizedBox(height: 30),
 
@@ -107,19 +79,8 @@ class AdminManagement extends StatelessWidget {
               Icons.people,
               Colors.purple,
               () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Mở danh sách người dùng')),
-                );
-              },
-            ),
-            _buildManagementCard(
-              'Thống kê người dùng',
-              'Phân tích hành vi người dùng',
-              Icons.analytics,
-              Colors.teal,
-              () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Mở thống kê người dùng')),
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AdminUsersPage()),
                 );
               },
             ),
@@ -199,6 +160,159 @@ class AdminManagement extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildProductsTable(BuildContext context) {
+    final products = ProductData.getAllProducts();
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(flex: 2, child: Text('Tên', style: TextStyle(fontWeight: FontWeight.bold))),
+              Expanded(child: Text('Giá', style: TextStyle(fontWeight: FontWeight.bold))),
+              Expanded(child: Text('Danh mục', style: TextStyle(fontWeight: FontWeight.bold))),
+              SizedBox(width: 80),
+            ],
+          ),
+          Divider(),
+          ...products.map((p) => Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                Expanded(flex: 2, child: Text(p.name)),
+                Expanded(child: Text(p.price.toStringAsFixed(0))),
+                Expanded(child: Text(p.category)),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit, color: Colors.blue),
+                      onPressed: () => _openProductForm(context, product: p),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        await ProductData.deleteProduct(p.id);
+                        setState(() {});
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Đã xóa ${p.name}')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openProductForm(BuildContext context, {Product? product}) async {
+    final isEdit = product != null;
+    final idController = TextEditingController(text: product?.id ?? DateTime.now().millisecondsSinceEpoch.toString());
+    final nameController = TextEditingController(text: product?.name ?? '');
+    final priceController = TextEditingController(text: product != null ? product.price.toStringAsFixed(0) : '');
+    final categoryController = TextEditingController(text: product?.category ?? '');
+    final imageController = TextEditingController(text: product?.imagePath ?? '');
+    final descController = TextEditingController(text: product?.description ?? '');
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(isEdit ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(labelText: 'Tên sản phẩm'),
+                ),
+                TextField(
+                  controller: priceController,
+                  decoration: InputDecoration(labelText: 'Giá (VNĐ)'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: categoryController,
+                  decoration: InputDecoration(labelText: 'Danh mục'),
+                ),
+                TextField(
+                  controller: imageController,
+                  decoration: InputDecoration(labelText: 'Đường dẫn ảnh (assets/...)'),
+                ),
+                TextField(
+                  controller: descController,
+                  decoration: InputDecoration(labelText: 'Mô tả'),
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final name = nameController.text.trim();
+                final price = double.tryParse(priceController.text.trim()) ?? 0;
+                final category = categoryController.text.trim();
+                final image = imageController.text.trim();
+                final desc = descController.text.trim();
+
+                if (name.isEmpty || price <= 0 || category.isEmpty || image.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin hợp lệ')),
+                  );
+                  return;
+                }
+
+                final newProduct = Product(
+                  id: idController.text,
+                  name: name,
+                  description: desc,
+                  price: price,
+                  imagePath: image,
+                  category: category,
+                );
+
+                if (isEdit) {
+                  await ProductData.updateProduct(newProduct);
+                } else {
+                  await ProductData.addProduct(newProduct);
+                }
+
+                if (mounted) {
+                  Navigator.of(ctx).pop();
+                  setState(() {});
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFDC586D), foregroundColor: Colors.white),
+              child: Text(isEdit ? 'Lưu' : 'Thêm'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

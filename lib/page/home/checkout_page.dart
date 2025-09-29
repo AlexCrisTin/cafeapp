@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/cart_service.dart';
 import 'package:cafeproject/database/data/orders_service.dart';
-import 'package:cafeproject/page/profile/orders_page.dart';
+import 'package:cafeproject/database/auth/navigation_helper.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -169,8 +169,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     );
                     await CartService.clear();
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const OrdersPage()),
-                      (route) => route.isFirst,
+                      MaterialPageRoute(builder: (_) => NavigationHelper.getHomePage()),
+                      (route) => false,
                     );
                   },
                   style: ElevatedButton.styleFrom(

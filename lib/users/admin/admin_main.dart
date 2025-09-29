@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/users/admin/dashboard/admin_dashboard.dart';
 import 'package:cafeproject/users/admin/management/admin_management.dart';
-import 'package:cafeproject/users/admin/analytics/admin_analytics.dart';
-import 'package:cafeproject/database/auth/auth_service.dart';
+
 
 class AdminMain extends StatefulWidget {
   const AdminMain({super.key});
@@ -14,7 +13,7 @@ class AdminMain extends StatefulWidget {
 class _AdminMainState extends State<AdminMain> {
   int _currentIndex = 0;
   late PageController _pageController;
-  final AuthService _auth = AuthService.instance;
+ 
 
   @override
   void initState() {
@@ -57,10 +56,7 @@ class _AdminMainState extends State<AdminMain> {
             icon: Icon(Icons.manage_accounts),
             label: 'Quản lý',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Thống kê',
-          ),
+          
         ],
       ),
       body: PageView(
@@ -73,7 +69,6 @@ class _AdminMainState extends State<AdminMain> {
         children: [
           AdminDashboard(),
           AdminManagement(),
-          AdminAnalytics(),
         ],
       ),
     );

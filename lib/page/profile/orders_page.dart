@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/orders_service.dart';
 import 'package:cafeproject/page/profile/order_detail_page.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
@@ -12,8 +13,14 @@ class OrdersPage extends StatefulWidget {
 class _OrdersPageState extends State<OrdersPage> {
   @override
   Widget build(BuildContext context) {
-    final orders = OrdersService.orders.where((order) => order.status.name == 'pending').toList();
+    final auth = AuthService.instance;
+    final userId = auth.currentUser?.email;
+    final orders = OrdersService.orders
+        .where((order) => order.status.name == 'pending')
+        .where((order) => userId == null ? false : order.userId == userId)
+        .toList();
     return Scaffold(
+      
       body: orders.isEmpty
           ? const Center(child: Text('Chưa có đơn hàng'))
           : ListView.separated(

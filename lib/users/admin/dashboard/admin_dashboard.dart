@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:cafeproject/database/data/orders_service.dart';
+import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
+import 'package:cafeproject/database/auth/navigation_helper.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final AuthService _auth = AuthService.instance;
+    final totalOrders = OrdersService.orders.length;
+    final totalProducts = ProductData.getAllProducts().length;
+    final totalUsers = AuthService.instance.totalUsers;
     
     return Scaffold(
       appBar: AppBar(
@@ -72,7 +77,7 @@ class AdminDashboard extends StatelessWidget {
                 Expanded(
                   child: _buildStatCard(
                     'Tổng đơn hàng',
-                    '156',
+                    totalOrders.toString(),
                     Icons.shopping_cart,
                     Colors.blue,
                   ),
@@ -80,10 +85,10 @@ class AdminDashboard extends StatelessWidget {
                 SizedBox(width: 10),
                 Expanded(
                   child: _buildStatCard(
-                    'Doanh thu',
-                    '12.5M',
-                    Icons.attach_money,
-                    Colors.green,
+                    'Sản phẩm',
+                    totalProducts.toString(),
+                    Icons.inventory,
+                    Colors.purple,
                   ),
                 ),
               ],
@@ -96,18 +101,9 @@ class AdminDashboard extends StatelessWidget {
                 Expanded(
                   child: _buildStatCard(
                     'Khách hàng',
-                    '1,234',
+                    totalUsers.toString(),
                     Icons.people,
                     Colors.orange,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: _buildStatCard(
-                    'Sản phẩm',
-                    '89',
-                    Icons.inventory,
-                    Colors.purple,
                   ),
                 ),
               ],
@@ -175,6 +171,54 @@ class AdminDashboard extends StatelessWidget {
                 ),
               ],
             ),
+
+            SizedBox(height: 30),
+
+            // Logout section
+            Text(
+              'Tài khoản',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red, width: 1.5),
+              ),
+              child: InkWell(
+                onTap: () {
+                  AuthService.instance.logout();
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => NavigationHelper.getHomePage()),
+                    (route) => false,
+                  );
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.logout, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text(
+                        'Đăng xuất',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -225,6 +269,8 @@ class AdminDashboard extends StatelessWidget {
       ),
     );
   }
+
+  // Removed currency formatter since revenue card was removed
 
   Widget _buildQuickActionCard(String title, IconData icon, Color color, VoidCallback onTap) {
     return InkWell(

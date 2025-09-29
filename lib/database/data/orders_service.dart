@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:cafeproject/database/data/cart_service.dart';
 import 'package:cafeproject/database/data/product_data.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:path_provider/path_provider.dart';
 
 enum OrderStatus { pending, completed }
@@ -39,6 +40,7 @@ class OrderItem {
 
 class Order {
   final String id;
+  final String? userId; // email/username of owner; null for guest
   final String customerName;
   final String phone;
   final String address;
@@ -48,6 +50,7 @@ class Order {
 
   Order({
     required this.id,
+    required this.userId,
     required this.customerName,
     required this.phone,
     required this.address,
@@ -62,6 +65,7 @@ class Order {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,
       'customerName': customerName,
       'phone': phone,
       'address': address,
@@ -83,6 +87,7 @@ class Order {
 
     return Order(
       id: json['id'],
+      userId: json['userId'],
       customerName: json['customerName'],
       phone: json['phone'],
       address: json['address'],
@@ -141,8 +146,17 @@ class OrdersService {
     required String payment,
     required List<CartItem> cartItems,
   }) async {
+    // Try to capture current user from AuthService without tight coupling
+    String? userId;
+    final auth = AuthService.instance;
+    if (auth.isLoggedIn && auth.currentUser != null) {
+      userId = auth.currentUser!.email;
+    } else if (auth.isGuest) {
+      userId = null; // guest order
+    }
     final order = Order(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
+      userId: userId,
       customerName: name,
       phone: phone,
       address: address,
