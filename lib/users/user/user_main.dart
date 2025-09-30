@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/users/user/home/user_home.dart';
 import 'package:cafeproject/users/user/profile/user_profile.dart';
 import 'package:cafeproject/users/user/bottom_navigation/user_bottom_nav.dart';
-import 'package:cafeproject/page/menu/menu_head.dart';
-import 'package:cafeproject/page/search/search_page.dart';
+import 'package:cafeproject/page%20cafe/menu/menu_head.dart';
+import 'package:cafeproject/page%20cafe/search/search_page.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/database/auth/login_required.dart';
 

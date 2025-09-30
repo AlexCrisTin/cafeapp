@@ -20,9 +20,9 @@ class _BeginState extends State<Begin> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFDC586D),
+               Color(0xFFDC586D),
               Color(0xFFFB959F),
-              Colors.white,
+            Color(0xFFffbb99)
             ],
             stops: [0.0, 0.6, 1.0],
           ),
@@ -32,13 +32,11 @@ class _BeginState extends State<Begin> {
             padding: EdgeInsets.all(20),
             child: Column(
               children: [
-                // Logo và Welcome
                 Expanded(
                   flex: 3,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo
                       Container(
                         width: 120,
                         height: 120,
@@ -90,13 +88,11 @@ class _BeginState extends State<Begin> {
                   ),
                 ),
 
-                // Buttons
                 Expanded(
                   flex: 2,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Đăng nhập button
                       _buildButton(
                         'Đăng nhập',
                         Icons.login,
@@ -110,7 +106,6 @@ class _BeginState extends State<Begin> {
                       ),
                       SizedBox(height: 15),
                       
-                      // Đăng ký button
                       _buildButton(
                         'Đăng ký',
                         Icons.person_add,
@@ -125,7 +120,6 @@ class _BeginState extends State<Begin> {
                       ),
                       SizedBox(height: 20),
                       
-                      // Khách button
                       _buildGuestButton(),
                     ],
                   ),
@@ -186,21 +180,21 @@ class _BeginState extends State<Begin> {
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.2),
           borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: Colors.white.withOpacity(0.3)),
+          border: Border.all(color: Color(0xFFa33757).withOpacity(0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.visibility,
-              color: Colors.white,
+              color: Color(0xFFa33757).withOpacity(0.3),
               size: 18,
             ),
             SizedBox(width: 8),
             Text(
               'Tiếp tục với tư cách khách',
               style: TextStyle(
-                color: Colors.white,
+                color: Color(0xFFa33757).withOpacity(0.3),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),

@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Đăng nhập'),
-        backgroundColor: Colors.red,
+        backgroundColor: Color(0xFFffbb99),
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -46,8 +46,6 @@ class _LoginPageState extends State<LoginPage> {
               'Thông tin đăng nhập',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
-
             const SizedBox(height: 20),
             TextField(
               controller: _emailController,
@@ -93,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                   NavigationHelper.navigateAfterLogin(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Color(0xFFffbb99),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
@@ -108,14 +106,14 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage()));
                   },
-                  child: const Text('Đăng ký'),
+                  child: const Text('Đăng ký', style: TextStyle(color: Color(0xFFffbb99))),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     AuthService.instance.continueAsGuest();
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GuestMain()));
                   },
-                  child: const Text('Khách'),
+                  child: const Text('Khách', style: TextStyle(color: Color(0xFFffbb99))),
                 ),
               ],
             ),
@@ -124,7 +122,16 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Begin()));
               },
-              child: const Text('Quay lại'),
+              child: Container(
+                alignment: Alignment.center,
+                height: 40,
+                width: 100,
+                decoration: BoxDecoration(
+                  color: Color(0xFFffbb99),
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: const Text('Quay lại', style: TextStyle(color: Colors.white)),
+              ),
             ),
           ],
         ),

@@ -1,19 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/data/orders_service.dart';
 import 'package:cafeproject/database/data/product_data.dart';
+import 'package:cafeproject/database/data/order_data.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/database/auth/navigation_helper.dart';
 import 'package:cafeproject/users/admin/management/admin_management.dart';
 
-class AdminDashboard extends StatelessWidget {
+class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
 
   @override
+  State<AdminDashboard> createState() => _AdminDashboardState();
+}
+
+class _AdminDashboardState extends State<AdminDashboard> {
+  int _totalOrders = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshOrdersCount();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // Refresh count when returning to this screen
+    _refreshOrdersCount();
+    super.didChangeDependencies();
+  }
+
+  void _refreshOrdersCount() {
+    final current = OrderData.getAllOrders().length;
+    if (!mounted) return;
+    setState(() {
+      _totalOrders = current;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final totalOrders = OrdersService.orders.length;
     final totalProducts = ProductData.getAllProducts().length;
     final totalUsers = AuthService.instance.totalUsers;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Admin Dashboard'),
@@ -60,7 +87,7 @@ class AdminDashboard extends StatelessWidget {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    'Quản lý hệ thống cafe của bạn',
+                    'Quản lý hệ thống cafe',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 16,
@@ -78,7 +105,7 @@ class AdminDashboard extends StatelessWidget {
                 Expanded(
                   child: _buildStatCard(
                     'Tổng đơn hàng',
-                    totalOrders.toString(),
+                    _totalOrders.toString(),
                     Icons.shopping_cart,
                     Colors.blue,
                   ),

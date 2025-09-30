@@ -14,9 +14,10 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
 
   @override
   Widget build(BuildContext context) {
+    final totalOrders = OrderData.getAllOrders().length;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quản lý đơn hàng'),
+        title: Text('Quản lý đơn hàng ($totalOrders)'),
         backgroundColor: Color(0xFFDC586D),
         foregroundColor: Colors.white,
       ),
