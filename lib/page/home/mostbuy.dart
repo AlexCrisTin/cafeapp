@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/page/home/itemdetail.dart';
-import 'package:cafeproject/utils/image_helper.dart';
+import 'package:cafeproject/database/img/image_helper.dart';
 
 class Mostbuy extends StatefulWidget {
   const Mostbuy({super.key});

@@ -3,7 +3,7 @@ import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/database/data/cart_service.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/database/auth/login_required.dart';
-import 'package:cafeproject/utils/image_helper.dart';
+import 'package:cafeproject/database/img/image_helper.dart';
 
 class ItemDetailPage extends StatefulWidget {
   final Product product;
