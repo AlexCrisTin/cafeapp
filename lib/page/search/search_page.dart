@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/page/home/itemdetail.dart';
+import 'package:cafeproject/utils/image_helper.dart';
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
 
@@ -87,16 +88,11 @@ class _SearchPageState extends State<SearchPage> {
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: Colors.redAccent),
                                 color: Colors.grey[200],
-                                image: product.imagePath.trim().isNotEmpty
-                                    ? DecorationImage(
-                                        image: AssetImage(product.imagePath),
-                                        fit: BoxFit.cover,
-                                      )
-                                    : null,
+                                image: ImageHelper.buildDecorationImage(product.imagePath),
                               ),
-                              child: product.imagePath.trim().isNotEmpty
-                                  ? null
-                                  : Icon(Icons.image, size: 18, color: Colors.grey),
+                              child: product.imagePath.trim().isEmpty
+                                  ? Icon(Icons.image, size: 18, color: Colors.grey)
+                                  : null,
                             ),
                             title: Text(product.name),
                             subtitle: Text(product.category),

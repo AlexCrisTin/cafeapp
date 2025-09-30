@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/cart_service.dart';
 import 'package:cafeproject/page/home/checkout_page.dart';
+import 'package:cafeproject/utils/image_helper.dart';
 
 class UserCart extends StatefulWidget {
   const UserCart({super.key});
@@ -107,10 +108,7 @@ class _UserCartState extends State<UserCart> {
                         height: 60,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                            image: AssetImage(product.imagePath),
-                            fit: BoxFit.cover,
-                          ),
+                          image: ImageHelper.buildDecorationImage(product.imagePath),
                         ),
                       ),
                       SizedBox(width: 12),

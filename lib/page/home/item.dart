@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/page/home/itemdetail.dart';
+import 'package:cafeproject/utils/image_helper.dart';
 
 class Item extends StatefulWidget {
   const Item({super.key});
@@ -61,12 +62,7 @@ class _item1State extends State<item1> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.redAccent, width: 3),
                     color: Colors.white,
-                    image: product != null
-                        ? DecorationImage(
-                            image: AssetImage(product.imagePath),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    image: ImageHelper.buildDecorationImage(product?.imagePath),
                   ),
                 ),
                 Container(

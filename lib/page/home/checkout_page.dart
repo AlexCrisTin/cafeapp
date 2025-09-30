@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/cart_service.dart';
-import 'package:cafeproject/database/data/orders_service.dart';
+import 'package:cafeproject/database/data/order_data.dart';
 import 'package:cafeproject/database/auth/navigation_helper.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -160,13 +161,33 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       );
                       return;
                     }
-                    await OrdersService.createOrder(
-                      name: _nameController.text.trim(),
-                      phone: _phoneController.text.trim(),
-                      address: _addressController.text.trim(),
-                      payment: _payment,
-                      cartItems: CartService.items,
+                    // Tạo đơn hàng với userId
+                    final orderId = DateTime.now().millisecondsSinceEpoch.toString();
+                    final userId = AuthService.instance.currentUser?.email ?? 'guest';
+                    
+                    final orderItems = CartService.items.map((cartItem) => OrderItem(
+                      productId: cartItem.product.id,
+                      productName: cartItem.product.name,
+                      price: cartItem.product.price,
+                      quantity: cartItem.quantity,
+                      size: cartItem.selectedSize,
+                    )).toList();
+                    
+                    final totalAmount = CartService.totalPrice;
+                    
+                    final order = Order(
+                      id: orderId,
+                      userId: userId,
+                      customerName: _nameController.text.trim(),
+                      customerPhone: _phoneController.text.trim(),
+                      deliveryAddress: _addressController.text.trim(),
+                      items: orderItems,
+                      totalAmount: totalAmount,
+                      status: 'Chờ xác nhận',
+                      createdAt: DateTime.now(),
                     );
+                    
+                    OrderData.addOrder(order);
                     await CartService.clear();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => NavigationHelper.getHomePage()),

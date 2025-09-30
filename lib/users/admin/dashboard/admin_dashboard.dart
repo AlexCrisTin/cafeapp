@@ -3,6 +3,7 @@ import 'package:cafeproject/database/data/orders_service.dart';
 import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/database/auth/navigation_helper.dart';
+import 'package:cafeproject/users/admin/management/admin_management.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -134,8 +135,9 @@ class AdminDashboard extends StatelessWidget {
                   Icons.inventory_2,
                   Colors.blue,
                   () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Mở quản lý sản phẩm')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AdminManagement()),
                     );
                   },
                 ),

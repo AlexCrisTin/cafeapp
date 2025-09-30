@@ -3,6 +3,7 @@ import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/database/data/cart_service.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/database/auth/login_required.dart';
+import 'package:cafeproject/utils/image_helper.dart';
 
 class ItemDetailPage extends StatefulWidget {
   final Product product;
@@ -43,18 +44,13 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.redAccent),
                 color: Colors.grey[200],
-                image: widget.product.imagePath.trim().isNotEmpty
-                    ? DecorationImage(
-                        image: AssetImage(widget.product.imagePath),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
+                image: ImageHelper.buildDecorationImage(widget.product.imagePath),
               ),
-              child: widget.product.imagePath.trim().isNotEmpty
-                  ? null
-                  : Center(
+              child: widget.product.imagePath.trim().isEmpty
+                  ? Center(
                       child: Icon(Icons.image, size: 50, color: Colors.grey),
-                    ),
+                    )
+                  : null,
             ),
             SizedBox(height: 20),
             Text(
