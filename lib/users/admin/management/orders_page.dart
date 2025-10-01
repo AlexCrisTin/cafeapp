@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/data/order_data.dart';
+import 'package:cafeproject/data/data/order_data.dart';
 
 class AdminOrdersPage extends StatefulWidget {
   const AdminOrdersPage({super.key});

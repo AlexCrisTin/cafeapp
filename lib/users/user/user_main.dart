@@ -4,8 +4,8 @@ import 'package:cafeproject/users/user/profile/user_profile.dart';
 import 'package:cafeproject/users/user/bottom_navigation/user_bottom_nav.dart';
 import 'package:cafeproject/page%20cafe/menu/menu_head.dart';
 import 'package:cafeproject/page%20cafe/search/search_page.dart';
-import 'package:cafeproject/database/auth/auth_service.dart';
-import 'package:cafeproject/database/auth/login_required.dart';
+import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/data/auth/login_required.dart';
 
 class UserMain extends StatefulWidget {
   const UserMain({super.key});

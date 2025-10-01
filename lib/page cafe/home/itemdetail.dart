@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/data/product_data.dart';
-import 'package:cafeproject/database/data/cart_service.dart';
-import 'package:cafeproject/database/auth/auth_service.dart';
-import 'package:cafeproject/database/auth/login_required.dart';
-import 'package:cafeproject/database/img/image_helper.dart';
+import 'package:cafeproject/data/data/product_data.dart';
+import 'package:cafeproject/data/data/cart_service.dart';
+import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/data/auth/login_required.dart';
+import 'package:cafeproject/data/img/image_upload.dart';
 
 class ItemDetailPage extends StatefulWidget {
   final Product product;

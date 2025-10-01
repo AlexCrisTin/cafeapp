@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/data/cart_service.dart';
-import 'package:cafeproject/database/data/orders_service.dart';
-import 'package:cafeproject/database/auth/navigation_helper.dart';
+import 'package:cafeproject/data/data/cart_service.dart';
+import 'package:cafeproject/data/data/orders_service.dart';
+import 'package:cafeproject/data/auth/navigation_helper.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});

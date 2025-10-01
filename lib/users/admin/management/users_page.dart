@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/auth/auth_service.dart';
+import 'package:cafeproject/data/auth/auth_service.dart';
 
 class AdminUsersPage extends StatefulWidget {
   const AdminUsersPage({super.key});

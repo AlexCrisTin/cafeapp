@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/data/product_data.dart';
-import 'package:cafeproject/database/data/order_data.dart';
-import 'package:cafeproject/database/auth/auth_service.dart';
-import 'package:cafeproject/database/auth/navigation_helper.dart';
-import 'package:cafeproject/users/admin/management/admin_management.dart';
+import 'package:cafeproject/data/data/product_data.dart';
+import 'package:cafeproject/data/data/order_data.dart';
+import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/data/auth/navigation_helper.dart';
+import 'package:cafeproject/users/admin/management/management.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});

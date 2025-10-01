@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/login/login.dart';
 import 'package:cafeproject/login/signup.dart';
 import 'package:cafeproject/users/guest/guest_main.dart';
-import 'package:cafeproject/database/auth/auth_service.dart';
+import 'package:cafeproject/data/auth/auth_service.dart';
 class Begin extends StatefulWidget {
   const Begin({super.key});
 

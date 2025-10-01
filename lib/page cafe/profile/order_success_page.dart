@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/auth/navigation_helper.dart';
+import 'package:cafeproject/data/auth/navigation_helper.dart';
 
 class OrderSuccessPage extends StatelessWidget {
   const OrderSuccessPage({super.key});

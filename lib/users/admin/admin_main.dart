@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/users/admin/dashboard/admin_dashboard.dart';
-import 'package:cafeproject/users/admin/management/admin_management.dart';
+import 'package:cafeproject/users/admin/dashboard/dashboard.dart';
+import 'package:cafeproject/users/admin/management/management.dart';
 
 
 class AdminMain extends StatefulWidget {

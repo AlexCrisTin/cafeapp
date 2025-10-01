@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/login/signup.dart';
 import 'package:cafeproject/login/begin.dart';
-import 'package:cafeproject/database/auth/auth_service.dart';
-import 'package:cafeproject/database/auth/navigation_helper.dart';
+import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/data/auth/navigation_helper.dart';
 import 'package:cafeproject/users/guest/guest_main.dart';
 
 class LoginPage extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/data/order_data.dart';
-import 'package:cafeproject/database/auth/auth_service.dart';
+import 'package:cafeproject/data/data/order_data.dart';
+import 'package:cafeproject/data/auth/auth_service.dart';
 import 'package:cafeproject/page%20cafe/profile/order_detail_page.dart';
 
 class OrdersPage extends StatefulWidget {
