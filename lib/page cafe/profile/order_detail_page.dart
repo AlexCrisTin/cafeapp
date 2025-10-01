@@ -118,6 +118,8 @@ class OrderDetailPage extends StatelessWidget {
     switch (status) {
       case OrderStatus.pending:
         return Colors.orange;
+      case OrderStatus.confirmed:
+        return Colors.blue;
       case OrderStatus.completed:
         return Colors.green;
     }
@@ -127,8 +129,10 @@ class OrderDetailPage extends StatelessWidget {
     switch (status) {
       case OrderStatus.pending:
         return 'Chờ xác nhận';
+      case OrderStatus.confirmed:
+        return 'Đang giao';
       case OrderStatus.completed:
-        return 'Đã giao';
+        return 'Hoàn thành';
     }
   }
 

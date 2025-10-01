@@ -24,6 +24,9 @@ Future<void> _initializeData() async {
     // Load dữ liệu đơn hàng
     await OrdersService.loadFromFile();
     
+    // Tạo đơn hàng test nếu không có
+    await OrdersService.createTestOrderIfEmpty();
+    
     // Load users
     await AuthService.instance.loadFromFile();
     

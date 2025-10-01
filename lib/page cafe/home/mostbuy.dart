@@ -28,7 +28,7 @@ class _MostbuyState extends State<Mostbuy> {
               itemBuilder: (context, index) {
                 final product = ProductData.getProductById('${index + 1}');
                 return Container(
-                  padding: EdgeInsets.only(left: 10, right: 10),
+                  padding: EdgeInsets.only(left: 20, right: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -43,13 +43,20 @@ class _MostbuyState extends State<Mostbuy> {
                           }
                         },
                         child: Container(
-                          width: 100,
-                          height: 100,
+                          padding: EdgeInsets.all(6),                    
                           decoration: BoxDecoration(
-                            color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.red),
-                            image: ImageHelper.buildDecorationImage(product?.imagePath),
+                            color: Colors.white,
+                          ),
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.red, width: 2),
+                              image: ImageHelper.buildDecorationImage(product?.imagePath),
+                            ),
                           ),
                         ),
                       ),
@@ -64,13 +71,20 @@ class _MostbuyState extends State<Mostbuy> {
                           }
                         },
                         child: Container(
-                          width: 100,
-                          height: 100,
+                          padding: EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.red),
-                            image: ImageHelper.buildDecorationImage(product?.imagePath),
+                            color: Colors.white,
+                          ),
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.red, width: 2),
+                              image: ImageHelper.buildDecorationImage(product?.imagePath),
+                            ),
                           ),
                         ),
                       ),
@@ -85,13 +99,20 @@ class _MostbuyState extends State<Mostbuy> {
                           }
                         },
                         child: Container(
-                          width: 100,
-                          height: 100,
+                          padding: EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.red),
-                            image: ImageHelper.buildDecorationImage(product?.imagePath),
+                            color: Colors.white,
+                          ),
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.red, width: 2),
+                              image: ImageHelper.buildDecorationImage(product?.imagePath),
+                            ),
                           ),
                         ),
                       ),

@@ -13,8 +13,22 @@ class _OrdersPageState extends State<OrdersPage> {
   @override
   Widget build(BuildContext context) {
     final orders = OrdersService.getCurrentUserOrders();
+    final completedOrders = orders.where((order) => order.status == OrderStatus.completed).toList();
     
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Đơn hàng của tôi'),
+        backgroundColor: Color(0xFFDC586D),
+        foregroundColor: Colors.white,
+        actions: [
+          if (completedOrders.isNotEmpty)
+            IconButton(
+              icon: Icon(Icons.delete_sweep),
+              onPressed: () => _showClearCompletedDialog(),
+              tooltip: 'Xóa đơn hàng đã hoàn thành',
+            ),
+        ],
+      ),
       body: orders.isEmpty
           ? Center(
               child: Column(
@@ -51,7 +65,18 @@ class _OrdersPageState extends State<OrdersPage> {
                         _buildStatusChip(order.status),
                       ],
                     ),
-                    trailing: Icon(Icons.chevron_right),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (order.status == OrderStatus.completed)
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _showDeleteOrderDialog(order.id),
+                            tooltip: 'Xóa đơn hàng',
+                          ),
+                        Icon(Icons.chevron_right),
+                      ],
+                    ),
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -74,9 +99,13 @@ class _OrdersPageState extends State<OrdersPage> {
         color = Colors.orange;
         statusText = 'Chờ xác nhận';
         break;
+      case OrderStatus.confirmed:
+        color = Colors.blue;
+        statusText = 'Đang giao';
+        break;
       case OrderStatus.completed:
         color = Colors.green;
-        statusText = 'Đã giao';
+        statusText = 'Hoàn thành';
         break;
     }
 
@@ -95,6 +124,80 @@ class _OrdersPageState extends State<OrdersPage> {
           fontWeight: FontWeight.bold,
         ),
       ),
+    );
+  }
+
+  void _showClearCompletedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xóa đơn hàng đã hoàn thành'),
+          content: Text('Bạn có chắc chắn muốn xóa tất cả đơn hàng đã hoàn thành? Hành động này không thể hoàn tác.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _clearCompletedOrders();
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: Text('Xóa tất cả', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _clearCompletedOrders() async {
+    final orders = OrdersService.getCurrentUserOrders();
+    final completedOrders = orders.where((order) => order.status == OrderStatus.completed).toList();
+    
+    for (var order in completedOrders) {
+      await OrdersService.deleteOrder(order.id);
+    }
+    
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Đã xóa ${completedOrders.length} đơn hàng đã hoàn thành')),
+    );
+  }
+
+  void _showDeleteOrderDialog(String orderId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xóa đơn hàng'),
+          content: Text('Bạn có chắc chắn muốn xóa đơn hàng này?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteOrder(orderId);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: Text('Xóa', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteOrder(String orderId) async {
+    await OrdersService.deleteOrder(orderId);
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Đã xóa đơn hàng')),
     );
   }
 }

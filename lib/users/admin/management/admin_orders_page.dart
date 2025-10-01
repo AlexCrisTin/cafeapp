@@ -9,20 +9,24 @@ class AdminOrdersPage extends StatefulWidget {
 }
 
 class _AdminOrdersPageState extends State<AdminOrdersPage> {
-  String _selectedStatus = 'Chờ xác nhận';
-  final List<String> _statusOptions = ['Chờ xác nhận', 'Đã giao'];
+  String _selectedStatus = 'Tất cả';
+  final List<String> _statusOptions = ['Tất cả', 'Chờ xác nhận', 'Đang giao', 'Hoàn thành'];
 
 
   @override
   Widget build(BuildContext context) {
     final pendingOrders = OrdersService.getPendingOrders();
+    final confirmedOrders = OrdersService.getConfirmedOrders();
     final completedOrders = OrdersService.getCompletedOrders();
     final totalPending = pendingOrders.length;
+    final totalConfirmed = confirmedOrders.length;
     final totalCompleted = completedOrders.length;
+    
+
     
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quản lý đơn hàng'),
+        title: Text('Quản lý đơn hàng (Chờ: $totalPending, Đang giao: $totalConfirmed, Hoàn thành: $totalCompleted)'),
         backgroundColor: Color(0xFFDC586D),
         foregroundColor: Colors.white,
         actions: [
@@ -30,7 +34,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
             IconButton(
               icon: Icon(Icons.delete_sweep),
               onPressed: () => _showClearCompletedDialog(),
-              tooltip: 'Xóa đơn hàng đã giao',
+              tooltip: 'Xóa đơn hàng đã hoàn thành',
             ),
         ],
       ),
@@ -74,10 +78,23 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
   }
 
   Widget _buildOrdersList() {
-    final orders = _selectedStatus == 'Chờ xác nhận' 
-        ? OrdersService.getPendingOrders()
-        : OrdersService.getCompletedOrders();
-
+    List<Order> orders;
+    switch (_selectedStatus) {
+      case 'Tất cả':
+        orders = OrdersService.orders;
+        break;
+      case 'Chờ xác nhận':
+        orders = OrdersService.getPendingOrders();
+        break;
+      case 'Đang giao':
+        orders = OrdersService.getConfirmedOrders();
+        break;
+      case 'Hoàn thành':
+        orders = OrdersService.getCompletedOrders();
+        break;
+      default:
+        orders = OrdersService.orders;
+    }
     if (orders.isEmpty) {
       return Center(
         child: Column(
@@ -86,9 +103,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
             Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey[400]),
             SizedBox(height: 20),
             Text(
-              _selectedStatus == 'Chờ xác nhận' 
-                  ? 'Không có đơn hàng chờ xử lý'
-                  : 'Không có đơn hàng đã giao',
+              _getEmptyMessage(),
               style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
           ],
@@ -180,7 +195,17 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
                   children: [
                     if (order.status == OrderStatus.pending) ...[
                       ElevatedButton(
-                        onPressed: () => _updateOrderStatus(order.id, OrderStatus.completed),
+                        onPressed: () => _showConfirmDialog(order.id, OrderStatus.confirmed, 'Xác nhận đơn hàng'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        ),
+                        child: Text('Xác nhận', style: TextStyle(fontSize: 12)),
+                      ),
+                    ] else if (order.status == OrderStatus.confirmed) ...[
+                      ElevatedButton(
+                        onPressed: () => _showConfirmDialog(order.id, OrderStatus.completed, 'Hoàn thành đơn hàng'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
@@ -217,9 +242,13 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
         color = Colors.orange;
         statusText = 'Chờ xác nhận';
         break;
+      case OrderStatus.confirmed:
+        color = Colors.blue;
+        statusText = 'Đang giao';
+        break;
       case OrderStatus.completed:
         color = Colors.green;
-        statusText = 'Đã giao';
+        statusText = 'Hoàn thành';
         break;
     }
 
@@ -241,8 +270,51 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
     );
   }
 
-  void _updateOrderStatus(String orderId, OrderStatus newStatus) {
-    OrdersService.updateOrderStatus(orderId, newStatus);
+  String _getEmptyMessage() {
+    switch (_selectedStatus) {
+      case 'Tất cả':
+        return 'Không có đơn hàng nào';
+      case 'Chờ xác nhận':
+        return 'Không có đơn hàng chờ xác nhận';
+      case 'Đang giao':
+        return 'Không có đơn hàng đang giao';
+      case 'Hoàn thành':
+        return 'Không có đơn hàng đã hoàn thành';
+      default:
+        return 'Không có đơn hàng';
+    }
+  }
+
+  void _showConfirmDialog(String orderId, OrderStatus newStatus, String title) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text('Bạn có chắc chắn muốn ${title.toLowerCase()}?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _updateOrderStatus(orderId, newStatus);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: newStatus == OrderStatus.confirmed ? Colors.blue : Colors.green,
+              ),
+              child: Text('Xác nhận', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _updateOrderStatus(String orderId, OrderStatus newStatus) async {
+    await OrdersService.updateOrderStatus(orderId, newStatus);
     setState(() {});
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Đã cập nhật trạng thái đơn hàng')),
@@ -254,8 +326,8 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Xóa đơn hàng đã giao'),
-          content: Text('Bạn có chắc chắn muốn xóa tất cả đơn hàng đã giao? Hành động này không thể hoàn tác.'),
+          title: Text('Xóa đơn hàng đã hoàn thành'),
+          content: Text('Bạn có chắc chắn muốn xóa tất cả đơn hàng đã hoàn thành? Hành động này không thể hoàn tác.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -305,7 +377,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
     await OrdersService.clearCompletedOrders();
     setState(() {});
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Đã xóa tất cả đơn hàng đã giao')),
+      SnackBar(content: Text('Đã xóa tất cả đơn hàng đã hoàn thành')),
     );
   }
 

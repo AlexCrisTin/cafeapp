@@ -7,11 +7,6 @@ class UserOrders extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Đơn hàng của tôi'),
-        backgroundColor: Color(0xFFDC586D),
-        foregroundColor: Colors.white,
-      ),
       body: OrdersPage(),
     );
   }

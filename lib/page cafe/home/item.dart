@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/page%20cafe/home/itemdetail.dart';
 import 'package:cafeproject/database/img/image_helper.dart';
+import 'package:cafeproject/database/data/cart_service.dart';
 
 class Item extends StatefulWidget {
   const Item({super.key});
@@ -51,37 +52,89 @@ class _item1State extends State<item1> {
               );
             } 
           },
-          child: Container(
-            child: Row(
-              children: [
-                Container(
-                  margin: EdgeInsets.only(left: 10, top: 10),
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.redAccent, width: 3),
-                    color: Colors.white,
-                    image: ImageHelper.buildDecorationImage(product?.imagePath),
+          child: Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: EdgeInsets.only(left: 10, right: 10, top: 10),
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      image: ImageHelper.buildDecorationImage(product?.imagePath),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  margin: EdgeInsets.only(top: 10),
-                  height: 100,
-                  width: 280,                 
-                  child: Column(
-                    children: [
-                      Text(product?.name ?? 'Sản phẩm'),
-                      Text(product?.category ?? ''),
-                      Text(product != null ? product.price.toStringAsFixed(0) + ' đ' : ''),
-                    ],
-                  ),
-                )
-              ],
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product?.name ?? 'Sản phẩm',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          product?.category ?? '',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                        SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Icon(Icons.star, color: Colors.amber, size: 16),
+                            Icon(Icons.star, color: Colors.amber, size: 16),
+                            Icon(Icons.star, color: Colors.amber, size: 16),
+                            Icon(Icons.star_half, color: Colors.amber, size: 16),
+                            Icon(Icons.star_border, color: Colors.amber, size: 16),
+                            SizedBox(width: 6),
+                            Text('3.5', style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              product != null ? '${product.price.toStringAsFixed(0)} đ' : '',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFDC586D)),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: product == null ? null : () async {
+                                await CartService.addToCart(product);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Đã thêm vào giỏ hàng')),
+                                );
+                                setState(() {});
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFFDC586D),
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              ),
+                              icon: Icon(Icons.add_shopping_cart, size: 18),
+                              label: Text('Thêm'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

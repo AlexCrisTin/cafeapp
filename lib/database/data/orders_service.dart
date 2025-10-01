@@ -5,7 +5,7 @@ import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:path_provider/path_provider.dart';
 
-enum OrderStatus { pending, completed }
+enum OrderStatus { pending, confirmed, completed }
 
 class OrderItem {
   final Product product;
@@ -141,17 +141,27 @@ class OrdersService {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$_fileName');
       
+      print('🔍 Loading orders from: ${file.path}');
+      print('📁 File exists: ${await file.exists()}');
+      
       if (await file.exists()) {
         final jsonString = await file.readAsString();
+        print('📄 File content length: ${jsonString.length}');
+        print('📄 File content: $jsonString');
+        
         final List<dynamic> jsonData = jsonDecode(jsonString);
+        print('📊 JSON data length: ${jsonData.length}');
         
         _orders.clear();
         for (var orderJson in jsonData) {
           _orders.add(Order.fromJson(orderJson));
         }
+        print('✅ Loaded ${_orders.length} orders');
+      } else {
+        print('📁 Orders file not found, starting with empty list');
       }
     } catch (e) {
-      print('Lỗi khi đọc đơn hàng: $e');
+      print('❌ Error loading orders: $e');
     }
   }
 
@@ -197,8 +207,12 @@ class OrdersService {
   static Future<void> updateOrderStatus(String orderId, OrderStatus newStatus) async {
     final index = _orders.indexWhere((o) => o.id == orderId);
     if (index >= 0) {
+      print('🔄 Updating order $orderId from ${_orders[index].status} to $newStatus');
       _orders[index].status = newStatus;
       await _saveToFile();
+      print('✅ Order status updated successfully');
+    } else {
+      print('❌ Order $orderId not found');
     }
   }
 
@@ -218,6 +232,11 @@ class OrdersService {
     return _orders.where((order) => order.status == OrderStatus.pending).toList();
   }
 
+  // Lấy đơn hàng đã xác nhận
+  static List<Order> getConfirmedOrders() {
+    return _orders.where((order) => order.status == OrderStatus.confirmed).toList();
+  }
+
   // Lấy đơn hàng đã hoàn thành
   static List<Order> getCompletedOrders() {
     return _orders.where((order) => order.status == OrderStatus.completed).toList();
@@ -227,6 +246,45 @@ class OrdersService {
   static Future<void> deleteOrder(String orderId) async {
     _orders.removeWhere((order) => order.id == orderId);
     await _saveToFile();
+  }
+
+  // Tạo đơn hàng test nếu không có đơn hàng nào
+  static Future<void> createTestOrderIfEmpty() async {
+    if (_orders.isEmpty) {
+      print('🧪 Creating test order...');
+      
+      // Tạo test product
+      final testProduct = Product(
+        id: 'test-product-1',
+        name: 'Cà phê sữa',
+        description: 'Cà phê sữa ngon',
+        price: 25000,
+        imagePath: 'assets/img/ca_phe_sua.png',
+        category: 'Đồ uống',
+      );
+      
+      // Tạo test order item
+      final testOrderItem = OrderItem(
+        product: testProduct,
+        quantity: 2,
+        selectedSize: 'M',
+      );
+      
+      final testOrder = Order(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: 'test@example.com',
+        customerName: 'Khách hàng test',
+        phone: '0123456789',
+        address: '123 Đường Test, Quận 1, TP.HCM',
+        paymentMethod: 'cash',
+        items: [testOrderItem],
+        status: OrderStatus.pending,
+      );
+      
+      _orders.add(testOrder);
+      await _saveToFile();
+      print('✅ Test order created with ${testOrder.items.length} items');
+    }
   }
 }
 
