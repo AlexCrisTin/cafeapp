@@ -110,25 +110,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               ),
               SizedBox(height: 15),
 
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Họ và tên',
-                  hintText: 'Nhập họ và tên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  prefixIcon: Icon(Icons.person),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập họ và tên';
-                  }
-                  return null;
-                },
-              ),
-
-              SizedBox(height: 15),
 
               TextFormField(
                 controller: _emailController,
@@ -238,27 +219,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 ),
               ),
 
-              SizedBox(height: 30),
-
-              // Save Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveProfile,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFDC586D),
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    'Lưu thay đổi',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
             ],
           ),
         ),

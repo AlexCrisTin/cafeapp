@@ -23,7 +23,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   @override
   void didChangeDependencies() {
-    // Refresh count when returning to this screen
     _refreshOrdersCount();
     super.didChangeDependencies();
   }
@@ -51,7 +50,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             icon: Icon(Icons.notifications),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Thông báo')),
+                SnackBar(content: Text('không có thông báo')),
               );
             },
           ),
@@ -62,7 +61,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Welcome Header
+            // Welcome Header 
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(20),
@@ -174,7 +173,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   Colors.green,
                   () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Xem đơn hàng mới')),
+                      SnackBar(content: Text('Tính năng đang phát triển')),
                     );
                   },
                 ),
@@ -184,7 +183,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   Colors.orange,
                   () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Xem báo cáo')),
+                      SnackBar(content: Text('Tính năng đang phát triển')),
                     );
                   },
                 ),
@@ -194,7 +193,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   Colors.grey,
                   () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Mở cài đặt')),
+                      SnackBar(content: Text('Tính năng đang phát triển')),
                     );
                   },
                 ),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/cart_service.dart';
-import 'package:cafeproject/database/data/order_data.dart';
+import 'package:cafeproject/database/data/orders_service.dart';
 import 'package:cafeproject/database/auth/navigation_helper.dart';
-import 'package:cafeproject/database/auth/auth_service.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -15,6 +14,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _cardNumberController = TextEditingController();
+  final TextEditingController _cardCvvController = TextEditingController();
+  final TextEditingController _cardExpiryController = TextEditingController();
 
   String _payment = 'card';
 
@@ -23,12 +25,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
     _nameController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _cardNumberController.dispose();
+    _cardCvvController.dispose();
+    _cardExpiryController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text('Thông tin'),
         backgroundColor: Color(0xFFDC586D),
@@ -37,9 +43,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -82,7 +90,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     Center(child: Text('Cách thức thanh toán', style: TextStyle(fontWeight: FontWeight.w600))),
                     SizedBox(height: 8),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Column(
                           children: [
@@ -123,27 +131,62 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ),
                           ],
                         ),
-                        SizedBox(width: 24),
-                        Column(
-                          children: [
-                            Radio<String>(
-                              value: 'other',
-                              groupValue: _payment,
-                              onChanged: (v) => setState(() => _payment = v ?? 'other'),
-                              visualDensity: VisualDensity.compact,
-                            ),
-                            Container(
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.pink[300],
-                              ),
-                              child: Icon(Icons.add, size: 18, color: Colors.white),
-                            ),
-                          ],
-                        ),
+                        
                       ],
+                    ),
+                    AnimatedSize(
+                      duration: Duration(milliseconds: 200),
+                      curve: Curves.easeInOut,
+                      child: _payment == 'card'
+                          ? Padding(
+                              padding: EdgeInsets.only(top: 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Thông tin thẻ', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  SizedBox(height: 8),
+                                  TextField(
+                                    controller: _cardNumberController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      hintText: 'Số thẻ (16 số)',
+                                      prefixIcon: Icon(Icons.credit_card),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _cardCvvController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(
+                                            hintText: 'CVV/CVC',
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 12),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _cardExpiryController,
+                                          keyboardType: TextInputType.datetime,
+                                          decoration: InputDecoration(
+                                            hintText: 'MM/YY',
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )
+                          : SizedBox.shrink(),
                     ),
                   ],
                 ),
@@ -161,33 +204,44 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       );
                       return;
                     }
-                    // Tạo đơn hàng với userId
-                    final orderId = DateTime.now().millisecondsSinceEpoch.toString();
-                    final userId = AuthService.instance.currentUser?.email ?? 'guest';
+                    if (_payment == 'card') {
+                      final cardNumber = _cardNumberController.text.replaceAll(' ', '');
+                      final cvv = _cardCvvController.text.trim();
+                      final expiry = _cardExpiryController.text.trim();
+                      if (cardNumber.isEmpty || cvv.isEmpty || expiry.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Vui lòng nhập đủ thông tin thẻ')),
+                        );
+                        return;
+                      }
+                      if (cardNumber.length < 13 || cardNumber.length > 19) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Số thẻ không hợp lệ')),
+                        );
+                        return;
+                      }
+                      if (cvv.length < 3 || cvv.length > 4) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('CVV/CVC không hợp lệ')),
+                        );
+                        return;
+                      }
+                      if (!RegExp(r'^(0[1-9]|1[0-2])\/\d{2}$').hasMatch(expiry)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Ngày hết hạn không hợp lệ (MM/YY)')),
+                        );
+                        return;
+                      }
+                    }
                     
-                    final orderItems = CartService.items.map((cartItem) => OrderItem(
-                      productId: cartItem.product.id,
-                      productName: cartItem.product.name,
-                      price: cartItem.product.price,
-                      quantity: cartItem.quantity,
-                      size: cartItem.selectedSize,
-                    )).toList();
-                    
-                    final totalAmount = CartService.totalPrice;
-                    
-                    final order = Order(
-                      id: orderId,
-                      userId: userId,
-                      customerName: _nameController.text.trim(),
-                      customerPhone: _phoneController.text.trim(),
-                      deliveryAddress: _addressController.text.trim(),
-                      items: orderItems,
-                      totalAmount: totalAmount,
-                      status: 'Chờ xác nhận',
-                      createdAt: DateTime.now(),
+                    // Tạo đơn hàng
+                    await OrdersService.createOrder(
+                      name: _nameController.text.trim(),
+                      phone: _phoneController.text.trim(),
+                      address: _addressController.text.trim(),
+                      payment: _payment,
+                      cartItems: CartService.items,
                     );
-                    
-                    OrderData.addOrder(order);
                     await CartService.clear();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => NavigationHelper.getHomePage()),
@@ -204,6 +258,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ),
             ],
+          ),
           ),
         ),
       ),

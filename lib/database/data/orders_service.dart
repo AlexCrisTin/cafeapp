@@ -107,6 +107,22 @@ class OrdersService {
 
   static List<Order> get orders => List.unmodifiable(_orders);
 
+  // Lấy đơn hàng theo user ID
+  static List<Order> getOrdersByUser(String userId) {
+    return _orders.where((order) => order.userId == userId).toList();
+  }
+
+  // Lấy đơn hàng của user hiện tại
+  static List<Order> getCurrentUserOrders() {
+    final auth = AuthService.instance;
+    if (auth.isLoggedIn && auth.currentUser != null) {
+      return getOrdersByUser(auth.currentUser!.email);
+    } else if (auth.isGuest) {
+      return getOrdersByUser('guest');
+    }
+    return [];
+  }
+
   // Lưu dữ liệu vào file
   static Future<void> _saveToFile() async {
     try {
@@ -174,6 +190,14 @@ class OrdersService {
     final index = _orders.indexWhere((o) => o.id == orderId);
     if (index >= 0) {
       _orders[index].status = OrderStatus.completed;
+      await _saveToFile();
+    }
+  }
+
+  static Future<void> updateOrderStatus(String orderId, OrderStatus newStatus) async {
+    final index = _orders.indexWhere((o) => o.id == orderId);
+    if (index >= 0) {
+      _orders[index].status = newStatus;
       await _saveToFile();
     }
   }

@@ -126,13 +126,48 @@ class _UserCartState extends State<UserCart> {
                               ),
                             ),
                             SizedBox(height: 4),
-                            Text(
-                              '${product.price.toStringAsFixed(0)} VNĐ',
-                              style: TextStyle(
-                                color: Color(0xFFDC586D),
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Builder(
+                              builder: (_) {
+                                final String? size = cartItem.selectedSize;
+                                final double unitPrice = (size != null && product.hasSize)
+                                    ? product.getPriceForSize(size)
+                                    : product.price;
+                                return Text(
+                                  '${unitPrice.toStringAsFixed(0)} VNĐ',
+                                  style: TextStyle(
+                                    color: Color(0xFFDC586D),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              },
                             ),
+                            if (product.hasSize) ...[
+                              SizedBox(height: 1),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Size:',
+                                    style: TextStyle(color: Colors.grey[700]),
+                                  ),
+                                  SizedBox(width: 8),
+                                  DropdownButton<String>(
+                                    value: cartItem.selectedSize,
+                                    hint: Text('Chọn size'),
+                                    items: (product.sizePrices?.keys.toList() ?? const <String>[]) 
+                                        .map((sz) => DropdownMenuItem<String>(
+                                              value: sz,
+                                              child: Text(sz),
+                                            ))
+                                        .toList(),
+                                    onChanged: (val) async {
+                                      if (val == null) return;
+                                      await CartService.setItemSize(product.id, val);
+                                      setState(() {});
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       ),

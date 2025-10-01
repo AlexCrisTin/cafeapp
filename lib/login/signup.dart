@@ -29,14 +29,15 @@ class _SignupPageState extends State<SignupPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Đăng ký'),
-        backgroundColor: Colors.red,
+        backgroundColor: Color(0xFFa33757),
         foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
             if (_error != null) ...[
               Container(
                 padding: const EdgeInsets.all(12),
@@ -56,10 +57,16 @@ class _SignupPageState extends State<SignupPage> {
             const SizedBox(height: 20),
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Tên đăng nhập',
                 hintText: 'Nhập tên đăng nhập',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Color(0xFFa33757)),
+                ),
                 prefixIcon: Icon(Icons.person),
               ),
               keyboardType: TextInputType.text,
@@ -67,10 +74,16 @@ class _SignupPageState extends State<SignupPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Mật khẩu',
                 hintText: 'Nhập mật khẩu',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Color(0xFFa33757)),
+                ),
                 prefixIcon: Icon(Icons.lock),
               ),
               obscureText: true,
@@ -78,17 +91,23 @@ class _SignupPageState extends State<SignupPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _confirmPasswordController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Xác nhận mật khẩu',
                 hintText: 'Nhập lại mật khẩu',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Color(0xFFa33757)),
+                ),
                 prefixIcon: Icon(Icons.lock_outline),
               ),
               obscureText: true,
             ),
             const SizedBox(height: 20),
             SizedBox(
-              width: double.infinity,
+              width: 100,
               child: ElevatedButton(
                 onPressed: () {
                   final email = _emailController.text.trim();
@@ -132,7 +151,7 @@ class _SignupPageState extends State<SignupPage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Color(0xFFa33757),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
@@ -149,17 +168,8 @@ class _SignupPageState extends State<SignupPage> {
               },
               child: const Text('Đã có tài khoản? Đăng nhập'),
             ),
-            const SizedBox(height: 10),
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context, 
-                  MaterialPageRoute(builder: (context) => Begin())
-                );
-              },
-              child: const Text('Quay lại'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

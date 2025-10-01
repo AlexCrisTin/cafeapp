@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/data/product_data.dart';
+import 'package:cafeproject/users/admin/management/admin_products_page.dart';
 import 'package:cafeproject/users/admin/management/admin_users_page.dart';
 import 'package:cafeproject/users/admin/management/admin_orders_page.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+ 
 
 class AdminManagement extends StatefulWidget {
   const AdminManagement({super.key});
@@ -21,13 +20,7 @@ class _AdminManagementState extends State<AdminManagement> {
         backgroundColor: Color(0xFFDC586D),
         foregroundColor: Colors.white,
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openProductForm(context),
-        backgroundColor: Color(0xFFDC586D),
-        foregroundColor: Colors.white,
-        icon: Icon(Icons.add),
-        label: Text('Thêm sản phẩm'),
-      ),
+      //  chuyển sang trang quản lý sản phẩm
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -41,7 +34,17 @@ class _AdminManagementState extends State<AdminManagement> {
               ),
             ),
             SizedBox(height: 10),
-            _buildProductsTable(context),
+            _buildManagementCard(
+              'Xem và quản lý sản phẩm',
+              'Danh sách, tìm kiếm, thêm/sửa/xóa sản phẩm',
+              Icons.inventory_2,
+              Colors.teal,
+              () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AdminProductsPage()),
+                );
+              },
+            ),
 
             SizedBox(height: 30),
 
@@ -166,68 +169,9 @@ class _AdminManagementState extends State<AdminManagement> {
     );
   }
 
-  Widget _buildProductsTable(BuildContext context) {
-    final products = ProductData.getAllProducts();
-    return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(flex: 2, child: Text('Tên', style: TextStyle(fontWeight: FontWeight.bold))),
-              Expanded(child: Text('Giá', style: TextStyle(fontWeight: FontWeight.bold))),
-              Expanded(child: Text('Danh mục', style: TextStyle(fontWeight: FontWeight.bold))),
-              SizedBox(width: 80),
-            ],
-          ),
-          Divider(),
-          ...products.map((p) => Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              children: [
-                Expanded(flex: 2, child: Text(p.name)),
-                Expanded(child: Text(p.price.toStringAsFixed(0))),
-                Expanded(child: Text(p.category)),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.edit, color: Colors.blue),
-                      onPressed: () => _openProductForm(context, product: p),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async {
-                        await ProductData.deleteProduct(p.id);
-                        setState(() {});
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Đã xóa ${p.name}')),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )),
-        ],
-      ),
-    );
-  }
+  // Bảng sản phẩm đã được chuyển sang AdminProductsPage
 
-  Future<void> _openProductForm(BuildContext context, {Product? product}) async {
+  /*Future<void> _openProductForm(BuildContext context, {Product? product}) async {
     final isEdit = product != null;
     final idController = TextEditingController(text: product?.id ?? DateTime.now().millisecondsSinceEpoch.toString());
     final nameController = TextEditingController(text: product?.name ?? '');
@@ -398,55 +342,7 @@ class _AdminManagementState extends State<AdminManagement> {
         );
       },
     );
-  }
+  }*/
 
-  Future<void> _pickImage(BuildContext context, Function(XFile) onImageSelected) async {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: Icon(Icons.photo_library),
-                title: Text('Chọn từ thư viện'),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  try {
-                    final ImagePicker picker = ImagePicker();
-                    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-                    if (image != null) {
-                      onImageSelected(image);
-                    }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Không thể truy cập thư viện ảnh: $e')),
-                    );
-                  }
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.camera_alt),
-                title: Text('Chụp ảnh mới'),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  try {
-                    final ImagePicker picker = ImagePicker();
-                    final XFile? image = await picker.pickImage(source: ImageSource.camera);
-                    if (image != null) {
-                      onImageSelected(image);
-                    }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Không thể truy cập camera: $e')),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  
 }

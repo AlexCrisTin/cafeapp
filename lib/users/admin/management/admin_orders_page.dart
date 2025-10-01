@@ -112,17 +112,6 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
               ],
             ),
             SizedBox(height: 8),
-            
-            // Customer info
-            Row(
-              children: [
-                Icon(Icons.person, size: 16, color: Colors.grey[600]),
-                SizedBox(width: 8),
-                Text('Khách hàng: ${order.customerName}'),
-              ],
-            ),
-            SizedBox(height: 4),
-            
             Row(
               children: [
                 Icon(Icons.account_circle, size: 16, color: Colors.grey[600]),

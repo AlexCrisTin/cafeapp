@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:cafeproject/database/data/product_data.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CartItem {
@@ -35,17 +36,32 @@ class CartItem {
 }
 
 class CartService {
-  static final List<CartItem> _items = [];
+  static final Map<String, List<CartItem>> _userCarts = {};
   static const String _fileName = 'cart_data.json';
 
-  static List<CartItem> get items => List.unmodifiable(_items);
+  static List<CartItem> get items {
+    final currentUserId = _getCurrentUserId();
+    return List.unmodifiable(_userCarts[currentUserId] ?? []);
+  }
+
+  // Lấy ID của user hiện tại
+  static String _getCurrentUserId() {
+    final auth = AuthService.instance;
+    if (auth.isLoggedIn && auth.currentUser != null) {
+      return auth.currentUser!.email;
+    } else if (auth.isGuest) {
+      return 'guest';
+    }
+    return 'anonymous';
+  }
 
   // Lưu dữ liệu vào file
   static Future<void> _saveToFile() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$_fileName');
-      final jsonData = _items.map((item) => item.toJson()).toList();
+      final jsonData = _userCarts.map((userId, items) => 
+        MapEntry(userId, items.map((item) => item.toJson()).toList()));
       await file.writeAsString(jsonEncode(jsonData));
     } catch (e) {
       print('Lỗi khi lưu giỏ hàng: $e');
@@ -60,15 +76,22 @@ class CartService {
       
       if (await file.exists()) {
         final jsonString = await file.readAsString();
-        final List<dynamic> jsonData = jsonDecode(jsonString);
+        final Map<String, dynamic> jsonData = jsonDecode(jsonString);
         
-        _items.clear();
-        for (var itemJson in jsonData) {
-          final productId = itemJson['productId'];
-          final product = ProductData.getProductById(productId);
-          if (product != null) {
-            _items.add(CartItem.fromJson(itemJson, product));
+        _userCarts.clear();
+        for (var userId in jsonData.keys) {
+          final List<dynamic> userItems = jsonData[userId];
+          final List<CartItem> items = [];
+          
+          for (var itemJson in userItems) {
+            final productId = itemJson['productId'];
+            final product = ProductData.getProductById(productId);
+            if (product != null) {
+              items.add(CartItem.fromJson(itemJson, product));
+            }
           }
+          
+          _userCarts[userId] = items;
         }
       }
     } catch (e) {
@@ -77,52 +100,111 @@ class CartService {
   }
 
   static Future<void> addToCart(Product product, {int quantity = 1, String? selectedSize}) async {
-    final index = _items.indexWhere((it) => 
+    final currentUserId = _getCurrentUserId();
+    if (!_userCarts.containsKey(currentUserId)) {
+      _userCarts[currentUserId] = [];
+    }
+    
+    final userItems = _userCarts[currentUserId]!;
+    final index = userItems.indexWhere((it) => 
       it.product.id == product.id && it.selectedSize == selectedSize);
     if (index >= 0) {
-      _items[index].quantity += quantity;
+      userItems[index].quantity += quantity;
     } else {
-      _items.add(CartItem(product: product, quantity: quantity, selectedSize: selectedSize));
+      userItems.add(CartItem(product: product, quantity: quantity, selectedSize: selectedSize));
     }
     await _saveToFile();
   }
 
   static Future<void> removeFromCart(String productId) async {
-    _items.removeWhere((it) => it.product.id == productId);
-    await _saveToFile();
+    final currentUserId = _getCurrentUserId();
+    if (_userCarts.containsKey(currentUserId)) {
+      _userCarts[currentUserId]!.removeWhere((it) => it.product.id == productId);
+      await _saveToFile();
+    }
   }
 
   static Future<void> updateQuantity(String productId, int quantity) async {
-    final index = _items.indexWhere((it) => it.product.id == productId);
-    if (index >= 0) {
-      _items[index].quantity = quantity.clamp(1, 9999);
-      await _saveToFile();
+    final currentUserId = _getCurrentUserId();
+    if (_userCarts.containsKey(currentUserId)) {
+      final userItems = _userCarts[currentUserId]!;
+      final index = userItems.indexWhere((it) => it.product.id == productId);
+      if (index >= 0) {
+        userItems[index].quantity = quantity.clamp(1, 9999);
+        await _saveToFile();
+      }
     }
   }
 
   static Future<void> increaseQuantity(String productId) async {
-    final index = _items.indexWhere((it) => it.product.id == productId);
-    if (index >= 0) {
-      _items[index].quantity += 1;
-      await _saveToFile();
+    final currentUserId = _getCurrentUserId();
+    if (_userCarts.containsKey(currentUserId)) {
+      final userItems = _userCarts[currentUserId]!;
+      final index = userItems.indexWhere((it) => it.product.id == productId);
+      if (index >= 0) {
+        userItems[index].quantity += 1;
+        await _saveToFile();
+      }
     }
   }
 
   static Future<void> decreaseQuantity(String productId) async {
-    final index = _items.indexWhere((it) => it.product.id == productId);
-    if (index >= 0) {
-      _items[index].quantity = (_items[index].quantity - 1).clamp(1, 9999);
-      await _saveToFile();
+    final currentUserId = _getCurrentUserId();
+    if (_userCarts.containsKey(currentUserId)) {
+      final userItems = _userCarts[currentUserId]!;
+      final index = userItems.indexWhere((it) => it.product.id == productId);
+      if (index >= 0) {
+        userItems[index].quantity -= 1;
+        if (userItems[index].quantity <= 0) {
+          userItems.removeAt(index);
+        }
+        await _saveToFile();
+      }
     }
   }
 
-  static int get totalQuantity => _items.fold(0, (sum, it) => sum + it.quantity);
+  // Cập nhật size cho item; nếu đã tồn tại item cùng sản phẩm + size mới thì gộp số lượng
+  static Future<void> setItemSize(String productId, String newSize) async {
+    final currentUserId = _getCurrentUserId();
+    if (!_userCarts.containsKey(currentUserId)) return;
+    
+    final userItems = _userCarts[currentUserId]!;
+    final index = userItems.indexWhere((it) => it.product.id == productId);
+    if (index < 0) return;
 
-  static double get totalPrice => _items.fold(0.0, (sum, it) => sum + it.totalPrice);
+    final CartItem current = userItems[index];
+    // Nếu không có size hoặc sản phẩm không hỗ trợ size thì bỏ qua
+    if (!current.product.hasSize) return;
+
+    // Nếu đã có item khác cùng product + size mới, gộp số lượng
+    final duplicateIndex = userItems.indexWhere((it) => it.product.id == productId && it.selectedSize == newSize);
+    if (duplicateIndex >= 0 && duplicateIndex != index) {
+      userItems[duplicateIndex].quantity += current.quantity;
+      userItems.removeAt(index);
+    } else {
+      userItems[index] = CartItem(product: current.product, quantity: current.quantity, selectedSize: newSize);
+    }
+    await _saveToFile();
+  }
+
+  static int get totalQuantity {
+    final currentUserId = _getCurrentUserId();
+    final userItems = _userCarts[currentUserId] ?? [];
+    return userItems.fold(0, (sum, it) => sum + it.quantity);
+  }
+
+  static double get totalPrice {
+    final currentUserId = _getCurrentUserId();
+    final userItems = _userCarts[currentUserId] ?? [];
+    return userItems.fold(0.0, (sum, it) => sum + it.totalPrice);
+  }
 
   static Future<void> clear() async {
-    _items.clear();
-    await _saveToFile();
+    final currentUserId = _getCurrentUserId();
+    if (_userCarts.containsKey(currentUserId)) {
+      _userCarts[currentUserId]!.clear();
+      await _saveToFile();
+    }
   }
 }
 

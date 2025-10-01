@@ -27,9 +27,10 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
             if (_error != null) ...[
               Container(
                 padding: const EdgeInsets.all(12),
@@ -49,10 +50,16 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 20),
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Tên đăng nhập',
                 hintText: 'Nhập tên đăng nhập',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Color(0xFFffbb99)),
+                ),
                 prefixIcon: Icon(Icons.person),
               ),
               keyboardType: TextInputType.text,
@@ -60,17 +67,23 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Mật khẩu',
                 hintText: 'Nhập mật khẩu',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Color(0xFFffbb99)),
+                ),
                 prefixIcon: Icon(Icons.lock),
               ),
               obscureText: true,
             ),
             const SizedBox(height: 20),
             SizedBox(
-              width: double.infinity,
+              width: 100,
               child: ElevatedButton(
                 onPressed: () {
                   final email = _emailController.text.trim();
@@ -117,23 +130,8 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Begin()));
-              },
-              child: Container(
-                alignment: Alignment.center,
-                height: 40,
-                width: 100,
-                decoration: BoxDecoration(
-                  color: Color(0xFFffbb99),
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: const Text('Quay lại', style: TextStyle(color: Colors.white)),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
