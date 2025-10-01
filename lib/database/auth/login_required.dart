@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/login/login.dart';
-import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 
 Future<bool> ensureLoggedIn(BuildContext context) async {
   if (AuthService.instance.isLoggedIn) {

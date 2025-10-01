@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/data/data/order_data.dart';
+import 'package:cafeproject/database/data/orders_service.dart';
 
 class AdminOrdersPage extends StatefulWidget {
   const AdminOrdersPage({super.key});
@@ -9,17 +9,30 @@ class AdminOrdersPage extends StatefulWidget {
 }
 
 class _AdminOrdersPageState extends State<AdminOrdersPage> {
-  String _selectedStatus = 'Tất cả';
-  final List<String> _statusOptions = ['Tất cả', 'Chờ xác nhận', 'Đang chuẩn bị', 'Đang giao', 'Đã giao', 'Đã hủy'];
+  String _selectedStatus = 'Chờ xác nhận';
+  final List<String> _statusOptions = ['Chờ xác nhận', 'Đã giao'];
+
 
   @override
   Widget build(BuildContext context) {
-    final totalOrders = OrderData.getAllOrders().length;
+    final pendingOrders = OrdersService.getPendingOrders();
+    final completedOrders = OrdersService.getCompletedOrders();
+    final totalPending = pendingOrders.length;
+    final totalCompleted = completedOrders.length;
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quản lý đơn hàng ($totalOrders)'),
+        title: Text('Quản lý đơn hàng'),
         backgroundColor: Color(0xFFDC586D),
         foregroundColor: Colors.white,
+        actions: [
+          if (totalCompleted > 0)
+            IconButton(
+              icon: Icon(Icons.delete_sweep),
+              onPressed: () => _showClearCompletedDialog(),
+              tooltip: 'Xóa đơn hàng đã giao',
+            ),
+        ],
       ),
       body: Column(
         children: [
@@ -61,12 +74,11 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
   }
 
   Widget _buildOrdersList() {
-    final orders = OrderData.getAllOrders();
-    final filteredOrders = _selectedStatus == 'Tất cả' 
-        ? orders 
-        : orders.where((order) => order.status == _selectedStatus).toList();
+    final orders = _selectedStatus == 'Chờ xác nhận' 
+        ? OrdersService.getPendingOrders()
+        : OrdersService.getCompletedOrders();
 
-    if (filteredOrders.isEmpty) {
+    if (orders.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -74,7 +86,9 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
             Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey[400]),
             SizedBox(height: 20),
             Text(
-              'Không có đơn hàng nào',
+              _selectedStatus == 'Chờ xác nhận' 
+                  ? 'Không có đơn hàng chờ xử lý'
+                  : 'Không có đơn hàng đã giao',
               style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
           ],
@@ -84,9 +98,9 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
 
     return ListView.builder(
       padding: EdgeInsets.all(16),
-      itemCount: filteredOrders.length,
+      itemCount: orders.length,
       itemBuilder: (context, index) {
-        final order = filteredOrders[index];
+        final order = orders[index];
         return _buildOrderCard(order);
       },
     );
@@ -125,7 +139,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
               children: [
                 Icon(Icons.phone, size: 16, color: Colors.grey[600]),
                 SizedBox(width: 8),
-                Text('SĐT: ${order.customerPhone}'),
+                Text('SĐT: ${order.phone}'),
               ],
             ),
             SizedBox(height: 4),
@@ -134,7 +148,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
               children: [
                 Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
                 SizedBox(width: 8),
-                Expanded(child: Text('Địa chỉ: ${order.deliveryAddress}')),
+                Expanded(child: Text('Địa chỉ: ${order.address}')),
               ],
             ),
             SizedBox(height: 12),
@@ -147,8 +161,8 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${item.productName} x${item.quantity}'),
-                  Text('${(item.price * item.quantity).toStringAsFixed(0)} đ'),
+                  Text('${item.product.name} x${item.quantity}${item.selectedSize != null ? ' (${item.selectedSize})' : ''}'),
+                  Text('${item.totalPrice.toStringAsFixed(0)} đ'),
                 ],
               ),
             )),
@@ -159,50 +173,30 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Tổng: ${order.totalAmount.toStringAsFixed(0)} đ',
+                  'Tổng: ${order.totalPrice.toStringAsFixed(0)} đ',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFDC586D)),
                 ),
                 Row(
                   children: [
-                    if (order.status == 'Chờ xác nhận') ...[
+                    if (order.status == OrderStatus.pending) ...[
                       ElevatedButton(
-                        onPressed: () => _updateOrderStatus(order.id, 'Đang chuẩn bị'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        ),
-                        child: Text('Xác nhận', style: TextStyle(fontSize: 12)),
-                      ),
-                      SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () => _updateOrderStatus(order.id, 'Đã hủy'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        ),
-                        child: Text('Hủy', style: TextStyle(fontSize: 12)),
-                      ),
-                    ] else if (order.status == 'Đang chuẩn bị') ...[
-                      ElevatedButton(
-                        onPressed: () => _updateOrderStatus(order.id, 'Đang giao'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        ),
-                        child: Text('Giao hàng', style: TextStyle(fontSize: 12)),
-                      ),
-                    ] else if (order.status == 'Đang giao') ...[
-                      ElevatedButton(
-                        onPressed: () => _updateOrderStatus(order.id, 'Đã giao'),
+                        onPressed: () => _updateOrderStatus(order.id, OrderStatus.completed),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
                           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         ),
                         child: Text('Hoàn thành', style: TextStyle(fontSize: 12)),
+                      ),
+                    ] else if (order.status == OrderStatus.completed) ...[
+                      ElevatedButton(
+                        onPressed: () => _showDeleteOrderDialog(order.id),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        ),
+                        child: Text('Xóa', style: TextStyle(fontSize: 12)),
                       ),
                     ],
                   ],
@@ -215,26 +209,18 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
     );
   }
 
-  Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(OrderStatus status) {
     Color color;
+    String statusText;
     switch (status) {
-      case 'Chờ xác nhận':
+      case OrderStatus.pending:
         color = Colors.orange;
+        statusText = 'Chờ xác nhận';
         break;
-      case 'Đang chuẩn bị':
-        color = Colors.blue;
-        break;
-      case 'Đang giao':
-        color = Colors.purple;
-        break;
-      case 'Đã giao':
+      case OrderStatus.completed:
         color = Colors.green;
+        statusText = 'Đã giao';
         break;
-      case 'Đã hủy':
-        color = Colors.red;
-        break;
-      default:
-        color = Colors.grey;
     }
 
     return Container(
@@ -245,7 +231,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
         border: Border.all(color: color),
       ),
       child: Text(
-        status,
+        statusText,
         style: TextStyle(
           color: color,
           fontSize: 12,
@@ -255,11 +241,79 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
     );
   }
 
-  void _updateOrderStatus(String orderId, String newStatus) {
-    OrderData.updateOrderStatus(orderId, newStatus);
+  void _updateOrderStatus(String orderId, OrderStatus newStatus) {
+    OrdersService.updateOrderStatus(orderId, newStatus);
     setState(() {});
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Đã cập nhật trạng thái đơn hàng')),
+    );
+  }
+
+  void _showClearCompletedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xóa đơn hàng đã giao'),
+          content: Text('Bạn có chắc chắn muốn xóa tất cả đơn hàng đã giao? Hành động này không thể hoàn tác.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _clearCompletedOrders();
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: Text('Xóa tất cả', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteOrderDialog(String orderId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xóa đơn hàng'),
+          content: Text('Bạn có chắc chắn muốn xóa đơn hàng này?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteOrder(orderId);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: Text('Xóa', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _clearCompletedOrders() async {
+    await OrdersService.clearCompletedOrders();
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Đã xóa tất cả đơn hàng đã giao')),
+    );
+  }
+
+  Future<void> _deleteOrder(String orderId) async {
+    await OrdersService.deleteOrder(orderId);
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Đã xóa đơn hàng')),
     );
   }
 }

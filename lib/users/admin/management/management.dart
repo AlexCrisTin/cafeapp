@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/users/admin/management/products_page.dart';
-import 'package:cafeproject/users/admin/management/users_page.dart';
-import 'package:cafeproject/users/admin/management/orders_page.dart';
+import 'package:cafeproject/users/admin/management/admin_products_page.dart';
+import 'package:cafeproject/users/admin/management/admin_users_page.dart';
+import 'package:cafeproject/users/admin/management/admin_orders_page.dart';
  
 
 class AdminManagement extends StatefulWidget {

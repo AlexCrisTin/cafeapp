@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/page%20cafe/home/page_cafe.dart';
 import 'package:cafeproject/page%20cafe/home/item.dart';
 import 'package:cafeproject/page%20cafe/home/mostbuy.dart';
-import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/login/begin.dart';
 
 class GuestBrowse extends StatelessWidget {

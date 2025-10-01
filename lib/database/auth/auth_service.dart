@@ -40,6 +40,16 @@ class AuthService {
     }).toList();
   }
 
+  // Debug method để kiểm tra users
+  void debugUsers() {
+    print('🔍 DEBUG USERS:');
+    print('📊 Total users: ${_users.length}');
+    print('📋 Users list: ${_users.keys.toList()}');
+    for (var entry in _users.entries) {
+      print('👤 ${entry.key}: ${entry.value}');
+    }
+  }
+
   bool loginWithCredentials(String email, String password) {
     final entry = _users[email.trim().toLowerCase()];
     if (entry == null) {
@@ -67,7 +77,7 @@ class AuthService {
   }
 
   // Register new user
-  bool registerUser(String email, String password) {
+  Future<bool> registerUser(String email, String password) async {
     final cleanEmail = email.trim().toLowerCase();
     
     // Check if user already exists
@@ -81,36 +91,36 @@ class AuthService {
       'role': UserRole.user,
     };
     
-    // Persist to file (fire and forget)
-    _saveToFile();
+    // Persist to file
+    await _saveToFile();
     return true;
   }
 
   // Admin ops
-  bool deleteUser(String username) {
+  Future<bool> deleteUser(String username) async {
     final key = username.trim().toLowerCase();
     if (!_users.containsKey(key)) return false;
     if (key == 'admin') return false; // protect default admin
     _users.remove(key);
-    _saveToFile();
+    await _saveToFile();
     return true;
   }
 
-  bool setUserRole(String username, UserRole role) {
+  Future<bool> setUserRole(String username, UserRole role) async {
     final key = username.trim().toLowerCase();
     final user = _users[key];
     if (user == null) return false;
     user['role'] = role;
-    _saveToFile();
+    await _saveToFile();
     return true;
   }
 
-  bool resetPassword(String username, String newPassword) {
+  Future<bool> resetPassword(String username, String newPassword) async {
     final key = username.trim().toLowerCase();
     final user = _users[key];
     if (user == null) return false;
     user['password'] = newPassword;
-    _saveToFile();
+    await _saveToFile();
     return true;
   }
 
@@ -119,9 +129,22 @@ class AuthService {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$_fileName');
-      await file.writeAsString(jsonEncode(_users));
+      
+      // Convert UserRole enum to string for JSON serialization
+      final Map<String, dynamic> serializableUsers = {};
+      for (var entry in _users.entries) {
+        serializableUsers[entry.key] = {
+          'password': entry.value['password'],
+          'role': entry.value['role'].toString().split('.').last, // Convert enum to string
+        };
+      }
+      
+      final jsonString = jsonEncode(serializableUsers);
+      await file.writeAsString(jsonString);
+      print('✅ Users saved to file: ${file.path}');
+      print('📊 Users data: $jsonString');
     } catch (e) {
-      // ignore persistence errors in demo
+      print('❌ Error saving users: $e');
     }
   }
 
@@ -133,12 +156,45 @@ class AuthService {
       if (await file.exists()) {
         final jsonString = await file.readAsString();
         final Map<String, dynamic> data = jsonDecode(jsonString);
-        _users = data.map((k, v) => MapEntry<String, Map<String, dynamic>>(k, Map<String, dynamic>.from(v)));
+        
+        // Clear current users and load from file
+        _users.clear();
+        
+        // Convert string role back to UserRole enum
+        for (var entry in data.entries) {
+          final roleString = entry.value['role'] as String;
+          UserRole role;
+          switch (roleString) {
+            case 'admin':
+              role = UserRole.admin;
+              break;
+            case 'user':
+              role = UserRole.user;
+              break;
+            case 'guest':
+              role = UserRole.guest;
+              break;
+            default:
+              role = UserRole.user; // default fallback
+          }
+          
+          _users[entry.key] = {
+            'password': entry.value['password'],
+            'role': role,
+          };
+        }
+        
+        print('✅ Users loaded from file: ${file.path}');
+        print('📊 Loaded users: ${_users.keys.toList()}');
+        print('📊 Users data: $data');
       } else {
+        print('📁 Users file not found, creating default admin...');
         // seed default admin and save
         await _saveToFile();
       }
     } catch (e) {
+      print('❌ Error loading users: $e');
+      print('🔄 Keeping default admin user...');
       // keep defaults on error
     }
   }

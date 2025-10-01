@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/data/data/order_data.dart';
+import 'package:cafeproject/database/data/orders_service.dart';
 
 class OrderDetailPage extends StatelessWidget {
   final Order order;
@@ -39,7 +39,7 @@ class OrderDetailPage extends StatelessWidget {
                   Icon(Icons.info_outline, color: _getStatusColor(order.status)),
                   SizedBox(width: 8),
                   Text(
-                    'Trạng thái: ${order.status}',
+                    'Trạng thái: ${_getStatusText(order.status)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: _getStatusColor(order.status),
@@ -55,9 +55,9 @@ class OrderDetailPage extends StatelessWidget {
             SizedBox(height: 8),
             Text('Tên: ${order.customerName}', style: TextStyle(fontSize: 16)),
             SizedBox(height: 4),
-            Text('SĐT: ${order.customerPhone}', style: TextStyle(fontSize: 16)),
+            Text('SĐT: ${order.phone}', style: TextStyle(fontSize: 16)),
             SizedBox(height: 4),
-            Text('Địa chỉ: ${order.deliveryAddress}', style: TextStyle(fontSize: 16)),
+            Text('Địa chỉ: ${order.address}', style: TextStyle(fontSize: 16)),
             SizedBox(height: 16),
             
             // Order items
@@ -71,10 +71,10 @@ class OrderDetailPage extends StatelessWidget {
                   final item = order.items[index];
                   return Card(
                     child: ListTile(
-                      title: Text(item.productName),
-                      subtitle: Text('Số lượng: ${item.quantity}${item.size != null ? ' (Size: ${item.size})' : ''}'),
+                      title: Text(item.product.name),
+                      subtitle: Text('Số lượng: ${item.quantity}${item.selectedSize != null ? ' (Size: ${item.selectedSize})' : ''}'),
                       trailing: Text(
-                        _formatPrice(item.price * item.quantity),
+                        _formatPrice(item.totalPrice),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -97,7 +97,7 @@ class OrderDetailPage extends StatelessWidget {
                 children: [
                   Text('Tổng cộng:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   Text(
-                    _formatPrice(order.totalAmount),
+                    _formatPrice(order.totalPrice),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -108,38 +108,30 @@ class OrderDetailPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16),
-            
-            // Order date
-            Text(
-              'Ngày đặt: ${_formatDate(order.createdAt)}',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(OrderStatus status) {
     switch (status) {
-      case 'Chờ xác nhận':
+      case OrderStatus.pending:
         return Colors.orange;
-      case 'Đang chuẩn bị':
-        return Colors.blue;
-      case 'Đang giao':
-        return Colors.purple;
-      case 'Đã giao':
+      case OrderStatus.completed:
         return Colors.green;
-      case 'Đã hủy':
-        return Colors.red;
-      default:
-        return Colors.grey;
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  String _getStatusText(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.pending:
+        return 'Chờ xác nhận';
+      case OrderStatus.completed:
+        return 'Đã giao';
+    }
   }
+
 }
 
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/data/data/product_data.dart';
-import 'package:cafeproject/data/data/order_data.dart';
-import 'package:cafeproject/data/auth/auth_service.dart';
-import 'package:cafeproject/data/auth/navigation_helper.dart';
+import 'package:cafeproject/database/data/product_data.dart';
+import 'package:cafeproject/database/data/orders_service.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
+import 'package:cafeproject/database/auth/navigation_helper.dart';
 import 'package:cafeproject/users/admin/management/management.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -28,7 +28,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   void _refreshOrdersCount() {
-    final current = OrderData.getAllOrders().length;
+    final current = OrdersService.orders.length;
     if (!mounted) return;
     setState(() {
       _totalOrders = current;

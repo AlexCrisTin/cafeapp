@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:cafeproject/data/data/cart_service.dart';
-import 'package:cafeproject/data/data/product_data.dart';
-import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/database/data/cart_service.dart';
+import 'package:cafeproject/database/data/product_data.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:path_provider/path_provider.dart';
 
 enum OrderStatus { pending, completed }
@@ -204,6 +204,28 @@ class OrdersService {
 
   static Future<void> clear() async {
     _orders.clear();
+    await _saveToFile();
+  }
+
+  // Xóa tất cả đơn hàng đã hoàn thành
+  static Future<void> clearCompletedOrders() async {
+    _orders.removeWhere((order) => order.status == OrderStatus.completed);
+    await _saveToFile();
+  }
+
+  // Lấy chỉ đơn hàng đang chờ xử lý
+  static List<Order> getPendingOrders() {
+    return _orders.where((order) => order.status == OrderStatus.pending).toList();
+  }
+
+  // Lấy đơn hàng đã hoàn thành
+  static List<Order> getCompletedOrders() {
+    return _orders.where((order) => order.status == OrderStatus.completed).toList();
+  }
+
+  // Xóa đơn hàng theo ID
+  static Future<void> deleteOrder(String orderId) async {
+    _orders.removeWhere((order) => order.id == orderId);
     await _saveToFile();
   }
 }

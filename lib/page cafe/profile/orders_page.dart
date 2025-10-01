@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/data/data/order_data.dart';
-import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/database/data/orders_service.dart';
 import 'package:cafeproject/page%20cafe/profile/order_detail_page.dart';
 
 class OrdersPage extends StatefulWidget {
@@ -13,9 +12,7 @@ class OrdersPage extends StatefulWidget {
 class _OrdersPageState extends State<OrdersPage> {
   @override
   Widget build(BuildContext context) {
-    final auth = AuthService.instance;
-    final userId = auth.currentUser?.email ?? 'guest';
-    final orders = OrderData.getOrdersByUserId(userId);
+    final orders = OrdersService.getCurrentUserOrders();
     
     return Scaffold(
       body: orders.isEmpty
@@ -49,7 +46,7 @@ class _OrdersPageState extends State<OrdersPage> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Tổng: ${order.totalAmount.toStringAsFixed(0)} đ'),
+                        Text('Tổng: ${order.totalPrice.toStringAsFixed(0)} đ'),
                         SizedBox(height: 4),
                         _buildStatusChip(order.status),
                       ],
@@ -69,26 +66,18 @@ class _OrdersPageState extends State<OrdersPage> {
     );
   }
 
-  Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(OrderStatus status) {
     Color color;
+    String statusText;
     switch (status) {
-      case 'Chờ xác nhận':
+      case OrderStatus.pending:
         color = Colors.orange;
+        statusText = 'Chờ xác nhận';
         break;
-      case 'Đang chuẩn bị':
-        color = Colors.blue;
-        break;
-      case 'Đang giao':
-        color = Colors.purple;
-        break;
-      case 'Đã giao':
+      case OrderStatus.completed:
         color = Colors.green;
+        statusText = 'Đã giao';
         break;
-      case 'Đã hủy':
-        color = Colors.red;
-        break;
-      default:
-        color = Colors.grey;
     }
 
     return Container(
@@ -99,7 +88,7 @@ class _OrdersPageState extends State<OrdersPage> {
         border: Border.all(color: color),
       ),
       child: Text(
-        status,
+        statusText,
         style: TextStyle(
           color: color,
           fontSize: 12,

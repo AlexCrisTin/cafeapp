@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/login/login.dart';
-import 'package:cafeproject/login/begin.dart';
-import 'package:cafeproject/data/auth/auth_service.dart';
-import 'package:cafeproject/data/auth/navigation_helper.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
+import 'package:cafeproject/database/auth/navigation_helper.dart';
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
@@ -109,7 +108,7 @@ class _SignupPageState extends State<SignupPage> {
             SizedBox(
               width: 100,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final email = _emailController.text.trim();
                   final password = _passwordController.text;
                   final confirmPassword = _confirmPasswordController.text;
@@ -130,7 +129,7 @@ class _SignupPageState extends State<SignupPage> {
                   }
                   
                   // Try to register new user
-                  final success = AuthService.instance.registerUser(email, password);
+                  final success = await AuthService.instance.registerUser(email, password);
                   
                   if (!success) {
                     setState(() { _error = 'Email đã tồn tại. Vui lòng chọn email khác.'; });

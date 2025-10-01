@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
   const ProfileSettingsPage({super.key});

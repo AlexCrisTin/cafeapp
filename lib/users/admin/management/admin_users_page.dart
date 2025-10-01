@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/data/auth/auth_service.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 
 class AdminUsersPage extends StatefulWidget {
   const AdminUsersPage({super.key});
@@ -105,7 +105,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mật khẩu không được rỗng')));
         return;
       }
-      final success = _auth.resetPassword(username, pw);
+      final success = await _auth.resetPassword(username, pw);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(success ? 'Đặt lại mật khẩu thành công' : 'Thất bại')));
       setState(() {});
@@ -139,7 +139,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
       ),
     );
     if (ok == true) {
-      final success = _auth.setUserRole(username, selected);
+      final success = await _auth.setUserRole(username, selected);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(success ? 'Đổi vai trò thành công' : 'Thất bại')));
       setState(() {});
@@ -163,7 +163,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
       ),
     );
     if (ok == true) {
-      final success = _auth.deleteUser(username);
+      final success = await _auth.deleteUser(username);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(success ? 'Đã xóa' : 'Thất bại')));
       setState(() {});

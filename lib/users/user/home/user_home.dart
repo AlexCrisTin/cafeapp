@@ -3,8 +3,8 @@ import 'package:cafeproject/page%20cafe/home/page_cafe.dart';
 import 'package:cafeproject/page%20cafe/home/item.dart';
 import 'package:cafeproject/page%20cafe/home/mostbuy.dart';
 import 'package:cafeproject/page%20cafe/home/message_page.dart';
-import 'package:cafeproject/data/auth/auth_service.dart';
-import 'package:cafeproject/data/auth/login_required.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
+import 'package:cafeproject/database/auth/login_required.dart';
 
 class UserHome extends StatelessWidget {
   const UserHome({super.key});
