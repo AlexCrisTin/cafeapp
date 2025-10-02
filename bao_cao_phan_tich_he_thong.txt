@@ -1,0 +1,525 @@
+========================================
+BÁO CÁO PHÂN TÍCH HỆ THỐNG CAFE APP
+========================================
+
+I. TỔNG QUAN HỆ THỐNG
+=====================
+
+Hệ thống Cafe App là một ứng dụng Flutter quản lý quán cà phê với 3 loại người dùng:
+- Admin: Quản lý toàn bộ hệ thống
+- User: Khách hàng đã đăng ký
+- Guest: Khách hàng chưa đăng ký
+
+II. KIẾN TRÚC HỆ THỐNG
+====================
+
+1. Cấu trúc thư mục chính:
+   - lib/
+     - database/ (Quản lý dữ liệu)
+     - login/ (Xác thực người dùng)
+     - page cafe/ (Giao diện chính)
+     - users/ (Phân quyền người dùng)
+
+2. Kiến trúc phân tầng:
+   - Presentation Layer: UI Components
+   - Business Logic Layer: Services
+   - Data Layer: Local Storage (JSON files)
+
+III. CÁC CHỨC NĂNG CHÍNH VÀ CODE ĐẠI DIỆN
+========================================
+
+1. QUẢN LÝ XÁC THỰC NGƯỜI DÙNG
+=============================
+
+Chức năng: Đăng nhập, đăng ký, phân quyền người dùng
+File: lib/database/auth/auth_service.dart
+
+Code đại diện:
+```dart
+class AuthService {
+  static final AuthService instance = AuthService._internal();
+  
+  bool _isLoggedIn = false;
+  bool _isGuest = false;
+  AuthUser? _currentUser;
+  
+  bool loginWithCredentials(String email, String password) {
+    final entry = _users[email.trim().toLowerCase()];
+    if (entry == null) return false;
+    if (entry['password'] != password) return false;
+    
+    _currentUser = AuthUser(email: email.trim().toLowerCase(), 
+                           role: entry['role'] as UserRole);
+    _isLoggedIn = true;
+    _isGuest = false;
+    return true;
+  }
+  
+  Future<bool> registerUser(String email, String password) async {
+    final cleanEmail = email.trim().toLowerCase();
+    if (_users.containsKey(cleanEmail)) return false;
+    
+    _users[cleanEmail] = {
+      'password': password,
+      'role': UserRole.user,
+    };
+    await _saveToFile();
+    return true;
+  }
+}
+```
+
+2. QUẢN LÝ SẢN PHẨM
+===================
+
+Chức năng: Thêm, sửa, xóa, tìm kiếm sản phẩm
+File: lib/database/data/product_data.dart
+
+Code đại diện:
+```dart
+class Product {
+  final String id;
+  final String name;
+  final String description;
+  final double price;
+  final String imagePath;
+  final String category;
+  final bool hasSize;
+  final Map<String, double>? sizePrices;
+  
+  double getPriceForSize(String size) {
+    if (!hasSize || sizePrices == null) return price;
+    return sizePrices![size] ?? price;
+  }
+}
+
+class ProductData {
+  static List<Product> products = [];
+  
+  static Future<void> addProduct(Product product) async {
+    products.add(product);
+    await _saveToFile();
+  }
+  
+  static Future<void> updateProduct(Product product) async {
+    final index = products.indexWhere((p) => p.id == product.id);
+    if (index >= 0) {
+      products[index] = product;
+      await _saveToFile();
+    }
+  }
+  
+  static Future<void> deleteProduct(String productId) async {
+    products.removeWhere((p) => p.id == productId);
+    await _saveToFile();
+  }
+}
+```
+
+3. QUẢN LÝ GIỎ HÀNG
+===================
+
+Chức năng: Thêm, xóa, cập nhật số lượng sản phẩm trong giỏ hàng
+File: lib/database/data/cart_service.dart
+
+Code đại diện:
+```dart
+class CartItem {
+  final Product product;
+  int quantity;
+  final String? selectedSize;
+  
+  double get totalPrice {
+    if (selectedSize != null && product.hasSize) {
+      return product.getPriceForSize(selectedSize!) * quantity;
+    }
+    return product.price * quantity;
+  }
+}
+
+class CartService {
+  static final Map<String, List<CartItem>> _userCarts = {};
+  
+  static Future<void> addToCart(Product product, {int quantity = 1, String? selectedSize}) async {
+    final currentUserId = _getCurrentUserId();
+    if (!_userCarts.containsKey(currentUserId)) {
+      _userCarts[currentUserId] = [];
+    }
+    
+    final userItems = _userCarts[currentUserId]!;
+    final index = userItems.indexWhere((it) => 
+      it.product.id == product.id && it.selectedSize == selectedSize);
+    if (index >= 0) {
+      userItems[index].quantity += quantity;
+    } else {
+      userItems.add(CartItem(product: product, quantity: quantity, selectedSize: selectedSize));
+    }
+    await _saveToFile();
+  }
+  
+  static double get totalPrice {
+    final currentUserId = _getCurrentUserId();
+    final userItems = _userCarts[currentUserId] ?? [];
+    return userItems.fold(0.0, (sum, it) => sum + it.totalPrice);
+  }
+}
+```
+
+4. QUẢN LÝ ĐƠN HÀNG
+==================
+
+Chức năng: Tạo, cập nhật trạng thái, xem lịch sử đơn hàng
+File: lib/database/data/orders_service.dart
+
+Code đại diện:
+```dart
+enum OrderStatus { pending, confirmed, completed }
+
+class Order {
+  final String id;
+  final String? userId;
+  final String customerName;
+  final String phone;
+  final String address;
+  final String paymentMethod;
+  final List<OrderItem> items;
+  OrderStatus status;
+  
+  double get totalPrice => items.fold(0.0, (sum, it) => sum + it.totalPrice);
+}
+
+class OrdersService {
+  static final List<Order> _orders = [];
+  
+  static Future<Order> createOrder({
+    required String name,
+    required String phone,
+    required String address,
+    required String payment,
+    required List<CartItem> cartItems,
+  }) async {
+    String? userId;
+    final auth = AuthService.instance;
+    if (auth.isLoggedIn && auth.currentUser != null) {
+      userId = auth.currentUser!.email;
+    }
+    
+    final order = Order(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      userId: userId,
+      customerName: name,
+      phone: phone,
+      address: address,
+      paymentMethod: payment,
+      items: cartItems.map((ci) => OrderItem(
+        product: ci.product, 
+        quantity: ci.quantity, 
+        selectedSize: ci.selectedSize
+      )).toList(),
+    );
+    _orders.add(order);
+    await _saveToFile();
+    return order;
+  }
+  
+  static Future<void> updateOrderStatus(String orderId, OrderStatus newStatus) async {
+    final index = _orders.indexWhere((o) => o.id == orderId);
+    if (index >= 0) {
+      _orders[index].status = newStatus;
+      await _saveToFile();
+    }
+  }
+}
+```
+
+5. GIAO DIỆN NGƯỜI DÙNG
+======================
+
+Chức năng: Hiển thị sản phẩm, tìm kiếm, danh mục
+File: lib/page cafe/menu/menu_page.dart
+
+Code đại diện:
+```dart
+class MenuPage extends StatefulWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Danh mục sản phẩm
+          Container(
+            child: Column(
+              children: [
+                Text('Danh mục', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Row(
+                  children: [
+                    Expanded(child: _buildCategoryButton(
+                      icon: Icons.coffee,
+                      title: 'Cafe',
+                      color: Color(0xFF8D6E63),
+                      onTap: () => _navigateToCategory('Cafe'),
+                    )),
+                    // Các danh mục khác...
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Hiển thị tất cả sản phẩm
+          Container(
+            child: Column(
+              children: [
+                Text('Tất cả sản phẩm', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ...allProducts.map((product) => item1(productId: product.id)).toList(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+6. GIAO DIỆN ADMIN
+=================
+
+Chức năng: Quản lý sản phẩm, đơn hàng, người dùng
+File: lib/users/admin/management/admin_products_page.dart
+
+Code đại diện:
+```dart
+class AdminProductsPage extends StatefulWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openProductForm(context),
+        backgroundColor: const Color(0xFFDC586D),
+        icon: const Icon(Icons.add),
+        label: const Text('Thêm sản phẩm'),
+      ),
+      body: Column(
+        children: [
+          // Tìm kiếm sản phẩm
+          TextField(
+            controller: _searchController,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              hintText: 'Tìm theo tên, danh mục, mô tả...',
+              prefixIcon: const Icon(Icons.search),
+            ),
+          ),
+          // Bảng sản phẩm
+          Expanded(
+            child: _buildProductsTable(context, filtered),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildProductsTable(BuildContext context, List<Product> products) {
+    return ListView.builder(
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final p = products[index];
+        return Row(
+          children: [
+            Expanded(flex: 2, child: Text(p.name)),
+            Expanded(child: Text(p.price.toStringAsFixed(0))),
+            Expanded(child: Text(p.category)),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.blue),
+                  onPressed: () => _openProductForm(context, product: p),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () async {
+                    await ProductData.deleteProduct(p.id);
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+```
+
+7. THANH TOÁN VÀ CHECKOUT
+=========================
+
+Chức năng: Xử lý thông tin thanh toán, tạo đơn hàng
+File: lib/page cafe/home/checkout_page.dart
+
+Code đại diện:
+```dart
+class CheckoutPage extends StatefulWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          // Form thông tin khách hàng
+          TextField(
+            controller: _nameController,
+            decoration: InputDecoration(hintText: 'Họ và tên'),
+          ),
+          TextField(
+            controller: _phoneController,
+            decoration: InputDecoration(hintText: 'Số điện thoại'),
+          ),
+          TextField(
+            controller: _addressController,
+            decoration: InputDecoration(hintText: 'Địa chỉ'),
+          ),
+          // Phương thức thanh toán
+          Row(
+            children: [
+              Radio<String>(value: 'card', groupValue: _payment, onChanged: (v) => setState(() => _payment = v!)),
+              Radio<String>(value: 'cash', groupValue: _payment, onChanged: (v) => setState(() => _payment = v!)),
+            ],
+          ),
+          // Nút thanh toán
+          ElevatedButton(
+            onPressed: () async {
+              // Validation
+              if (_nameController.text.trim().isEmpty || 
+                  _phoneController.text.trim().isEmpty || 
+                  _addressController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Vui lòng điền đủ thông tin')),
+                );
+                return;
+              }
+              
+              // Tạo đơn hàng
+              await OrdersService.createOrder(
+                name: _nameController.text.trim(),
+                phone: _phoneController.text.trim(),
+                address: _addressController.text.trim(),
+                payment: _payment,
+                cartItems: CartService.items,
+              );
+              await CartService.clear();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => NavigationHelper.getHomePage()),
+                (route) => false,
+              );
+            },
+            child: Text('Mua'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+IV. ĐIỀU HƯỚNG VÀ PHÂN QUYỀN
+============================
+
+Chức năng: Điều hướng người dùng theo vai trò
+File: lib/database/auth/navigation_helper.dart
+
+Code đại diện:
+```dart
+class NavigationHelper {
+  static Widget getHomePage() {
+    final AuthService auth = AuthService.instance;
+    
+    if (!auth.isLoggedIn && !auth.isGuest) {
+      return Begin(); // Trang đăng nhập
+    }
+    
+    if (auth.isLoggedIn && auth.currentUser != null) {
+      switch (auth.currentUser!.role) {
+        case UserRole.admin:
+          return AdminMain();
+        case UserRole.user:
+          return UserMain();
+        case UserRole.guest:
+          return GuestMain();
+      }
+    }
+    
+    if (auth.isGuest) {
+      return GuestMain();
+    }
+    
+    return Begin();
+  }
+}
+```
+
+V. LƯU TRỮ DỮ LIỆU
+==================
+
+Chức năng: Lưu trữ dữ liệu local bằng JSON files
+File: lib/database/data/product_data.dart (phần _saveToFile)
+
+Code đại diện:
+```dart
+static Future<void> _saveToFile() async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/$_fileName');
+    final jsonData = products.map((product) => product.toJson()).toList();
+    await file.writeAsString(jsonEncode(jsonData));
+  } catch (e) {
+    print('Lỗi khi lưu sản phẩm: $e');
+  }
+}
+
+static Future<void> loadFromFile() async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/$_fileName');
+    
+    if (await file.exists()) {
+      final jsonString = await file.readAsString();
+      final List<dynamic> jsonData = jsonDecode(jsonString);
+      
+      products.clear();
+      for (var productJson in jsonData) {
+        products.add(Product.fromJson(productJson));
+      }
+    } else {
+      products = List<Product>.from(_defaultProducts);
+      await _saveToFile();
+    }
+  } catch (e) {
+    print('Lỗi khi đọc sản phẩm: $e');
+    products = List<Product>.from(_defaultProducts);
+  }
+}
+```
+
+VI. ĐÁNH GIÁ HỆ THỐNG
+=====================
+
+Ưu điểm:
+- Kiến trúc rõ ràng, tách biệt các layer
+- Hỗ trợ đa người dùng với phân quyền
+- Giao diện thân thiện, dễ sử dụng
+- Quản lý dữ liệu local hiệu quả
+- Code được tổ chức tốt, dễ maintain
+
+Hạn chế:
+- Chỉ lưu trữ local, không có đồng bộ cloud
+- Thiếu tính năng báo cáo thống kê
+- Chưa có tính năng đánh giá sản phẩm
+- Thiếu tính năng khuyến mãi/voucher
+
+VII. KẾT LUẬN
+=============
+
+Hệ thống Cafe App được thiết kế tốt với kiến trúc MVC rõ ràng, hỗ trợ đầy đủ các chức năng cơ bản của một ứng dụng quản lý quán cà phê. Code được tổ chức khoa học, dễ đọc và maintain. Hệ thống phù hợp cho các quán cà phê nhỏ đến trung bình với nhu cầu quản lý đơn giản.
+
+========================================
