@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cafeproject/database/data/product_data.dart';
-import 'package:cafeproject/page%20cafe/home/itemdetail.dart';
 import 'package:cafeproject/page%20cafe/menu/category_products_page.dart';
 import 'package:cafeproject/page%20cafe/home/item.dart';
 class MenuPage extends StatefulWidget {
@@ -11,147 +9,185 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  void _openProduct(BuildContext context, String productId) {
-    final product = ProductData.getProductById(productId);
-    if (product != null) {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => ItemDetailPage(product: product)),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không tìm thấy sản phẩm')),
-      );
-    }
-  }
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          margin: EdgeInsets.only(right: 10),
-          child: Container(
-            color: Colors.white,
-            width: double.infinity,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Cafe'),
-                      ),
-                    );
-                  },
-                  child: Container(
-                  margin: EdgeInsets.all(10),
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.red),
-                  ),
-                  child: Icon(Icons.coffee, size: 20,),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Trà sữa'),
-                      ),
-                    );
-                  },
-                  child: Container(
-                  margin: EdgeInsets.all(10),
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.red),
-                  ),
-                  child: Icon(Icons.coffee, size: 20,),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Trà'),
-                      ),
-                    );
-                  },
-                  child: Container(
-                  margin: EdgeInsets.all(10),
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.red),
-                  ),
-                  child: Icon(Icons.coffee, size: 20,),              
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Đồ ăn ngọt'),
-                      ),
-                    );
-                  },
-                  child: Container(
-                  margin: EdgeInsets.all(10),
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.red),
-                  ),
-                  child: Icon(Icons.coffee, size: 20,),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Đồ ăn mặn'),
-                      ),
-                    );
-                  },
-                  child: Container(
-                  margin: EdgeInsets.all(10),
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.red),
-                  ),
-                  child: Icon(Icons.coffee, size: 20,),
-                  ),
-                ),
-              ]
-            )
-          )
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          
 
-        Container(
-          child: Column(
-            children: [
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(top: 10, left: 10),
-                child: Text('Gợi ý cho bạn', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-              ),
-              item1(productId: '1'),
-              item1(productId: '2'),
-              item1(productId: '3'),  
-              item1(productId: '4'),
-              item1(productId: '5'),
-            ],
+          SizedBox(height: 10),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Danh mục',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildCategoryButton(
+                        icon: Icons.coffee,
+                        title: 'Cafe',
+                        color: Color(0xFF8D6E63),
+                        onTap: () => _navigateToCategory('Cafe'),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _buildCategoryButton(
+                        icon: Icons.local_drink,
+                        title: 'Trà sữa',
+                        color: Color(0xFFE91E63),
+                        onTap: () => _navigateToCategory('Trà sữa'),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _buildCategoryButton(
+                        icon: Icons.local_drink,
+                        title: 'Trà',
+                        color: Color(0xFF4CAF50),
+                        onTap: () => _navigateToCategory('Trà'),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildCategoryButton(
+                        icon: Icons.cake,
+                        title: 'Đồ ăn ngọt',
+                        color: Color(0xFFFF9800),
+                        onTap: () => _navigateToCategory('Đồ ăn ngọt'),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _buildCategoryButton(
+                        icon: Icons.restaurant,
+                        title: 'Đồ ăn mặn',
+                        color: Color(0xFF795548),
+                        onTap: () => _navigateToCategory('Đồ ăn mặn'),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(child: SizedBox()),
+                  ],
+                ),
+              ],
+            ),
           ),
-        )
-      ],
+
+          SizedBox(height: 25),
+
+          // Recommended products
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Gợi ý cho bạn',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'Xem tất cả',
+                        style: TextStyle(
+                          color: Color(0xFFDC586D),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                item1(productId: '1'),
+                item1(productId: '2'),
+                item1(productId: '3'),
+                item1(productId: '4'),
+                item1(productId: '5'),
+                SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryButton({
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToCategory(String category) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CategoryProductsPage(category: category),
+      ),
     );
   }
 }
