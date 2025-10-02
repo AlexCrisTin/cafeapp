@@ -248,44 +248,6 @@ class OrdersService {
     await _saveToFile();
   }
 
-  // Tạo đơn hàng test nếu không có đơn hàng nào
-  static Future<void> createTestOrderIfEmpty() async {
-    if (_orders.isEmpty) {
-      print('🧪 Creating test order...');
-      
-      // Tạo test product
-      final testProduct = Product(
-        id: 'test-product-1',
-        name: 'Cà phê sữa',
-        description: 'Cà phê sữa ngon',
-        price: 25000,
-        imagePath: 'assets/img/ca_phe_sua.png',
-        category: 'Đồ uống',
-      );
-      
-      // Tạo test order item
-      final testOrderItem = OrderItem(
-        product: testProduct,
-        quantity: 2,
-        selectedSize: 'M',
-      );
-      
-      final testOrder = Order(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: 'test@example.com',
-        customerName: 'Khách hàng test',
-        phone: '0123456789',
-        address: '123 Đường Test, Quận 1, TP.HCM',
-        paymentMethod: 'cash',
-        items: [testOrderItem],
-        status: OrderStatus.pending,
-      );
-      
-      _orders.add(testOrder);
-      await _saveToFile();
-      print('✅ Test order created with ${testOrder.items.length} items');
-    }
-  }
 }
 
 
