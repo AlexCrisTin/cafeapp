@@ -39,7 +39,7 @@ class _MenuPageState extends State<MenuPage> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Đồ uống'),
+                        builder: (_) => const CategoryProductsPage(category: 'Cafe'),
                       ),
                     );
                   },
@@ -58,7 +58,7 @@ class _MenuPageState extends State<MenuPage> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Đồ ăn'),
+                        builder: (_) => const CategoryProductsPage(category: 'Trà sữa'),
                       ),
                     );
                   },
@@ -77,7 +77,7 @@ class _MenuPageState extends State<MenuPage> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Đồ uống'),
+                        builder: (_) => const CategoryProductsPage(category: 'Trà'),
                       ),
                     );
                   },
@@ -96,7 +96,7 @@ class _MenuPageState extends State<MenuPage> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Đồ ăn'),
+                        builder: (_) => const CategoryProductsPage(category: 'Đồ ăn ngọt'),
                       ),
                     );
                   },
@@ -115,7 +115,7 @@ class _MenuPageState extends State<MenuPage> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const CategoryProductsPage(category: 'Đồ uống'),
+                        builder: (_) => const CategoryProductsPage(category: 'Đồ ăn mặn'),
                       ),
                     );
                   },

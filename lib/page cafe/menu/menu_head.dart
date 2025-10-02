@@ -8,7 +8,7 @@ class MenuHead extends StatelessWidget {
     return Column(
         children: [
           Container(
-            color: Colors.red,
+            color: Color(0xFFffbb94),
             height: 70,
             width: double.infinity,
             child: Row(
