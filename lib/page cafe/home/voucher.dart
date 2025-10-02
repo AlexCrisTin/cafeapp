@@ -10,30 +10,43 @@ class Voucher extends StatefulWidget {
 class _VoucherState extends State<Voucher> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 160,
-      color: Colors.transparent,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        children: [
-          _buildVoucherCard(
-            title: 'Giảm 20%',
-            desc: 'Cho đơn từ 100.000đ',
-            colors: [Color(0xFFFF9A9E), Color(0xFFFAD0C4)],
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.only(left: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text('Voucher', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[800]),),
+            ],
           ),
-          _buildVoucherCard(
-            title: 'Freeship',
-            desc: 'Áp dụng cho mọi đơn',
-            colors: [Color(0xFFA18CD1), Color(0xFFFBC2EB)],
-          ),
-          _buildVoucherCard(
-            title: 'Mua 2 tặng 1',
-            desc: 'Áp dụng đồ uống',
-            colors: [Color(0xFF84FAB0), Color(0xFF8FD3F4)],
-          ),
-        ],
+        ),
+        Container(
+        height: 160,
+        color: Colors.transparent,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          children: [
+            _buildVoucherCard(
+              title: 'Giảm 20%',
+              desc: 'Cho đơn từ 100.000đ',
+              colors: [Color(0xFFFF9A9E), Color(0xFFFAD0C4)],
+            ),
+            _buildVoucherCard(
+              title: 'Freeship',
+              desc: 'Áp dụng cho mọi đơn',
+              colors: [Color(0xFFA18CD1), Color(0xFFFBC2EB)],
+            ),
+            _buildVoucherCard(
+              title: 'Mua 2 tặng 1',
+              desc: 'Áp dụng đồ uống',
+              colors: [Color(0xFF84FAB0), Color(0xFF8FD3F4)],
+            ),
+          ],
+        ),
       ),
+      ],
     );
   }
 

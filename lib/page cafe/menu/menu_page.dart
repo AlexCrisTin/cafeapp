@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/page%20cafe/menu/category_products_page.dart';
 import 'package:cafeproject/page%20cafe/home/item.dart';
+import 'package:cafeproject/database/data/product_data.dart';
+
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
 
@@ -9,6 +11,22 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
+  List<Product> allProducts = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    await ProductData.loadFromFile();
+    setState(() {
+      allProducts = ProductData.getAllProducts();
+      isLoading = false;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -91,7 +109,7 @@ class _MenuPageState extends State<MenuPage> {
 
           SizedBox(height: 25),
 
-          // Recommended products
+          // All products section
           Container(
             padding: EdgeInsets.symmetric(horizontal: 15),
             child: Column(
@@ -101,31 +119,75 @@ class _MenuPageState extends State<MenuPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Gợi ý cho bạn',
+                      'Tất cả sản phẩm',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[800],
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Xem tất cả',
-                        style: TextStyle(
-                          color: Color(0xFFDC586D),
-                          fontWeight: FontWeight.w600,
+                    Row(
+                      children: [
+                        Text(
+                          '${allProducts.length} món',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
+                        SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            _loadProducts();
+                          },
+                          child: Icon(
+                            Icons.refresh,
+                            color: Color(0xFFDC586D),
+                            size: 20,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
                 SizedBox(height: 10),
-                item1(productId: '1'),
-                item1(productId: '2'),
-                item1(productId: '3'),
-                item1(productId: '4'),
-                item1(productId: '5'),
+                if (isLoading)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFDC586D)),
+                      ),
+                    ),
+                  )
+                else if (allProducts.isEmpty)
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'Chưa có sản phẩm nào',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  ...allProducts.map((product) => item1(productId: product.id)).toList(),
                 SizedBox(height: 20),
               ],
             ),
@@ -141,6 +203,8 @@ class _MenuPageState extends State<MenuPage> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final categoryCount = allProducts.where((product) => product.category == title).length;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -176,6 +240,14 @@ class _MenuPageState extends State<MenuPage> {
                 color: Colors.grey[700],
               ),
               textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 2),
+            Text(
+              '$categoryCount món',
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[500],
+              ),
             ),
           ],
         ),

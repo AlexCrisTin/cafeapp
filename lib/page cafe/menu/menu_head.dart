@@ -8,9 +8,15 @@ class MenuHead extends StatelessWidget {
     return Column(
         children: [
           Container(
-            color: Color(0xFFffbb94),
-            height: 70,
+            height: 90,
             width: double.infinity,
+            decoration: BoxDecoration(
+              color: Color(0xFFffbb94),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20), 
+                bottomRight: Radius.circular(20)
+              ),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
