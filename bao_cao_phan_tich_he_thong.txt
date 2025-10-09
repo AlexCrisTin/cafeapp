@@ -541,3 +541,119 @@ Có giải thích chi tiết về cách hoạt động
 Đánh giá hệ thống:
 Ưu điểm: Kiến trúc rõ ràng, phân quyền tốt, giao diện thân thiện
 Hạn chế: Chỉ lưu trữ local, thiếu tính năng báo cáo, chưa có đánh giá sản phẩm
+
+      Các component chính trong Android
+Main Activity:
+android/app/src/main/kotlin/com/example/cafeproject/MainActivity.kt (kế thừa FlutterActivity)
+Manifest:
+android/app/src/main/AndroidManifest.xml
+Permissions: CAMERA, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE
+activity chính: .MainActivity, exported=true, launchMode=singleTop, theme @style/LaunchTheme
+meta-data flutterEmbedding=2, NormalTheme
+<queries> cho ACTION_PROCESS_TEXT
+Plugins/thư viện Android hiện diện (theo build outputs): path_provider_android, shared_preferences_android, image_picker_android (chưa thấy dùng trực tiếp trong lib)
+        Các thành phần giao diện được sử dụng trong app (Flutter UI)
+Layout/khung:
+Scaffold, AppBar, SafeArea, Container, Center, SizedBox, Card
+Danh sách/scroll: ListView, ListView.separated, ListView.builder, PageView
+Điều hướng/Bottom bar:
+BottomNavigationBar, custom UserBottomNav (trong users/user/bottom_navigation/user_bottom_nav.dart)
+Form và nhập liệu:
+TextField, TextFormField (xuất hiện theo pattern tìm kiếm), DropdownButton, IconButton
+Nút: ElevatedButton, ElevatedButton.icon
+Ảnh/đồ họa:
+Image.asset, Image.file (qua ImageHelper.buildImage)
+Thông báo/hộp thoại:
+SnackBar (qua ScaffoldMessenger), AlertDialog, showDialog
+Một số trang/feature chính (điểm qua file):
+Auth: login/begin.dart, login/login.dart, login/signup.dart
+Người dùng: users/user/{user_main.dart, home, cart, orders, profile}
+Khách: users/guest/{guest_main.dart, browse, cart}
+Quản trị: users/admin/{admin_main.dart, dashboard, management/*}
+Menu/Tìm kiếm/Trang chủ: page cafe/menu/*, page cafe/search/search_page.dart, page cafe/home/*, page cafe/profile/*
+Thành phần database (data layer/persistence)
+Sản phẩm:
+database/data/product_data.dart
+Lớp Product, kho ProductData
+Lưu/đọc JSON file products_data.json qua path_provider tại Application Documents
+Có dữ liệu mặc định seed nếu chưa có file
+Giỏ hàng:
+database/data/cart_service.dart
+Lớp CartItem, service CartService quản lý giỏ theo user (map userId → list items)
+Lưu/đọc JSON file cart_data.json
+Tích hợp AuthService để xác định currentUserId (email | guest | anonymous)
+Đơn hàng:
+database/data/orders_service.dart
+Lớp OrderItem, Order, service OrdersService
+Lưu/đọc JSON file orders_data.json, các helper lọc theo trạng thái (pending/confirmed/completed) và theo user
+Tạo đơn từ các CartItem
+Model đơn hàng (in-memory phụ):
+database/data/order_data.dart (một mô hình khác in-memory, không persist)
+Xác thực/Người dùng:
+database/auth/auth_service.dart
+AuthService, AuthUser, UserRole (user|admin|guest)
+In-memory map người dùng + persist vào JSON users_data.json; seed sẵn admin
+API: đăng nhập, đăng ký, đổi vai trò, đổi mật khẩu, khách vãng lai
+Hỗ trợ điều hướng theo quyền:
+database/auth/navigation_helper.dart chọn trang Begin/AdminMain/UserMain/GuestMain theo trạng thái
+database/auth/login_required.dart hiển thị AlertDialog yêu cầu đăng nhập khi cần
+ 
+VIII. THÀNH PHẦN DATABASE (DATA LAYER)
+======================================
+
+1. Mục tiêu
+-----------
+- Cung cấp lớp trừu tượng quản lý dữ liệu cho toàn ứng dụng (sản phẩm, giỏ hàng, đơn hàng, người dùng) tách biệt với giao diện (UI) và điều hướng.
+- Đảm bảo tính nhất quán dữ liệu, khả năng khôi phục trạng thái qua các lần mở ứng dụng, và mở đường cho việc mở rộng sang backend/cloud.
+
+2. Công nghệ và nguyên tắc
+--------------------------
+- Lưu trữ cục bộ bằng JSON files tại Application Documents (sử dụng `path_provider`).
+- Đọc/ghi file bằng `dart:io` (`File.readAsString`, `File.writeAsString`).
+- Tuần tự hóa/giải tuần tự hóa bằng `dart:convert` (`jsonEncode`, `jsonDecode`).
+- Phân lớp rõ ràng: Model (định nghĩa dữ liệu) và Service/Repository (nghiệp vụ + persist).
+
+3. Cấu phần chính và vai trò
+----------------------------
+- Sản phẩm — `lib/database/data/product_data.dart`
+  - Model `Product` (id, name, description, price, imagePath, category, hasSize, sizePrices).
+  - Kho `ProductData` với CRUD: thêm, cập nhật, xóa, tải dữ liệu; phương thức `_saveToFile()` và `loadFromFile()`.
+  - Lưu tại `products_data.json`, có seed dữ liệu mặc định khi chưa tồn tại file.
+- Giỏ hàng — `lib/database/data/cart_service.dart`
+  - Model `CartItem` (product, quantity, selectedSize) với thuộc tính tính giá `totalPrice` theo size.
+  - Service `CartService` quản lý giỏ theo người dùng: ánh xạ `userId → List<CartItem>`; thao tác thêm/cập nhật/xóa; tổng tiền toàn giỏ.
+  - Tích hợp `AuthService` để xác định `currentUserId` (email | guest | anonymous). Lưu tại `cart_data.json`.
+- Đơn hàng — `lib/database/data/orders_service.dart`
+  - `OrderItem`, `Order`, và `OrderStatus { pending, confirmed, completed }`.
+  - `OrdersService` tạo đơn từ giỏ hàng, cập nhật trạng thái, lọc theo trạng thái/người dùng; persist qua `_saveToFile()`/`loadFromFile()` tại `orders_data.json`.
+- Mô hình đơn hàng phụ (in-memory) — `lib/database/data/order_data.dart`
+  - Phục vụ tính toán/tạm thời, không persist, hỗ trợ các màn hình/logic trung gian.
+- Xác thực/Người dùng — `lib/database/auth/auth_service.dart`
+  - `AuthService`, `AuthUser`, `UserRole (admin|user|guest)`; API đăng nhập, đăng ký, đổi vai trò/mật khẩu, chế độ khách.
+  - Lưu trữ người dùng tại `users_data.json` (seed sẵn tài khoản admin); kết nối với các service khác qua trạng thái xác thực.
+- Điều hướng theo quyền — `lib/database/auth/navigation_helper.dart`, `lib/database/auth/login_required.dart`
+  - Chọn trang Begin/AdminMain/UserMain/GuestMain dựa trên trạng thái đăng nhập/quyền; hiển thị `AlertDialog` yêu cầu đăng nhập khi cần.
+
+4. Luồng dữ liệu điển hình
+--------------------------
+- Người dùng thao tác trên UI (ví dụ `CheckoutPage`) → đọc dữ liệu giỏ qua `CartService` → gọi `OrdersService.createOrder(...)`.
+- `OrdersService` lấy `userId` từ `AuthService`, chuyển đổi `CartItem` → `OrderItem`, tạo `Order`, ghi `orders_data.json` → yêu cầu `CartService.clear()` để cập nhật `cart_data.json`.
+- Khi khởi động app: các kho/service gọi `loadFromFile()` để nạp trạng thái từ JSON; nếu thiếu file, seed dữ liệu mặc định và lưu lần đầu.
+
+5. Ưu điểm
+----------
+- Tách biệt rõ Presentation/Business/Data giúp code dễ bảo trì, kiểm thử, mở rộng.
+- Hoạt động offline, khởi động nhanh, khôi phục trạng thái ổn định giữa các phiên.
+- Dữ liệu có cấu trúc, tuần tự hóa rõ ràng, dễ di trú sang backend về sau.
+
+6. Hạn chế và hướng phát triển
+------------------------------
+- Chỉ lưu trữ cục bộ: không đồng bộ đa thiết bị, không realtime, rủi ro mất dữ liệu khi gỡ app.
+- Chưa có cơ chế giao dịch/khóa ghi; cần chú ý khi thao tác song song.
+- Đề xuất mở rộng:
+  - Tích hợp backend (REST/Firebase) với đồng bộ hai chiều và xác thực bảo mật hơn.
+  - Mã hóa dữ liệu nhạy cảm (thông tin người dùng), bổ sung logging có cấu trúc.
+  - Thêm unit/integration test cho (de)serialization, luồng tạo đơn, tính tổng giỏ hàng.
+  - Bổ sung chỉ mục/tìm kiếm nâng cao cho sản phẩm, cơ chế di trú dữ liệu (migration).
+Ảnh:
+database/img/image_helper.dart helper hiển thị ảnh từ asset hoặc file local, có errorBuilder

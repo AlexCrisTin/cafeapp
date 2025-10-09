@@ -42,7 +42,6 @@ class AuthService {
 
   // Debug method để kiểm tra users
   void debugUsers() {
-    print('🔍 DEBUG USERS:');
     print('📊 Total users: ${_users.length}');
     print('📋 Users list: ${_users.keys.toList()}');
     for (var entry in _users.entries) {
@@ -141,10 +140,9 @@ class AuthService {
       
       final jsonString = jsonEncode(serializableUsers);
       await file.writeAsString(jsonString);
-      print('✅ Users saved to file: ${file.path}');
-      print('📊 Users data: $jsonString');
+ 
     } catch (e) {
-      print('❌ Error saving users: $e');
+
     }
   }
 
@@ -184,17 +182,12 @@ class AuthService {
           };
         }
         
-        print('✅ Users loaded from file: ${file.path}');
-        print('📊 Loaded users: ${_users.keys.toList()}');
-        print('📊 Users data: $data');
+
       } else {
-        print('📁 Users file not found, creating default admin...');
         // seed default admin and save
         await _saveToFile();
       }
     } catch (e) {
-      print('❌ Error loading users: $e');
-      print('🔄 Keeping default admin user...');
       // keep defaults on error
     }
   }
