@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/orders_service.dart';
+import 'package:cafeproject/database/data/notification_data.dart';
 
 class AdminOrdersPage extends StatefulWidget {
   const AdminOrdersPage({super.key});
@@ -330,9 +331,45 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
 
   Future<void> _updateOrderStatus(String orderId, OrderStatus newStatus) async {
     await OrdersService.updateOrderStatus(orderId, newStatus);
+    
+    // Gửi thông báo cho user
+    final orders = OrdersService.orders;
+    bool notificationSent = false;
+    try {
+      final order = orders.firstWhere((o) => o.id == orderId);
+      NotificationType notificationType;
+      switch (newStatus) {
+        case OrderStatus.confirmed:
+          notificationType = NotificationType.orderConfirmed;
+          break;
+        case OrderStatus.completed:
+          notificationType = NotificationType.orderCompleted;
+          break;
+        case OrderStatus.pending:
+          notificationType = NotificationType.orderCancelled;
+          break;
+      }
+      
+      // Chỉ gửi thông báo nếu có userId hợp lệ
+      if (order.userId != null && order.userId!.isNotEmpty) {
+        await NotificationData.createOrderNotification(
+          userId: order.userId!,
+          orderId: orderId,
+          type: notificationType,
+          orderNumber: orderId.length > 8 ? orderId.substring(0, 8) : orderId, // Lấy 8 ký tự đầu của orderId
+        );
+        notificationSent = true;
+      }
+    } catch (e) {
+      print('Không tìm thấy đơn hàng: $e');
+    }
+    
     setState(() {});
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Đã cập nhật trạng thái đơn hàng')),
+      SnackBar(
+        content: Text('Đã cập nhật trạng thái đơn hàng${notificationSent ? ' và gửi thông báo cho khách hàng' : ''}'),
+        backgroundColor: Colors.green,
+      ),
     );
   }
 

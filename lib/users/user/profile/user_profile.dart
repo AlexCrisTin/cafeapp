@@ -3,7 +3,7 @@ import 'package:cafeproject/users/user/orders/user_orders.dart';
 import 'package:cafeproject/login/begin.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/page%20cafe/profile/profile_settings_page.dart';
-
+import 'package:cafeproject/users/user/profile/setting.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -138,9 +138,9 @@ class _UserProfileState extends State<UserProfile> {
                   title: Text('Cài đặt'),
                   trailing: Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
-                     ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Tính năng sẽ được phát triển sớm')),
-                        );
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const SettingsPage()),
+                    );
                   },
                 ),
                 Divider(height: 1),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/database/data/cart_service.dart';
 import 'package:cafeproject/database/data/orders_service.dart';
+import 'package:cafeproject/database/data/notification_data.dart';
 import 'package:cafeproject/database/auth/navigation_helper.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 void main() async {
@@ -24,6 +25,8 @@ Future<void> _initializeData() async {
     // Load dữ liệu đơn hàng
     await OrdersService.loadFromFile();
     
+    // Load dữ liệu thông báo
+    await NotificationData.loadFromFile();
     
     // Load users
     await AuthService.instance.loadFromFile();

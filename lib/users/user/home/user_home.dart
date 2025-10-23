@@ -2,12 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/page%20cafe/home/page_cafe.dart';
 import 'package:cafeproject/page%20cafe/home/item.dart';
 import 'package:cafeproject/page%20cafe/home/mostbuy.dart';
-import 'package:cafeproject/page%20cafe/home/message_page.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/database/auth/login_required.dart';
 import 'package:cafeproject/page%20cafe/home/voucher.dart';
-class UserHome extends StatelessWidget {
+import 'package:cafeproject/users/user/notifications/user_notifications.dart';
+import 'package:cafeproject/database/data/notification_data.dart';
+class UserHome extends StatefulWidget {
   const UserHome({super.key});
+
+  @override
+  State<UserHome> createState() => _UserHomeState();
+}
+
+class _UserHomeState extends State<UserHome> {
+  int unreadCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationCount();
+  }
+
+  Future<void> _loadNotificationCount() async {
+    await NotificationData.loadFromFile();
+    final AuthService _auth = AuthService.instance;
+    final currentUserId = _auth.currentUser?.email ?? 'guest';
+    setState(() {
+      unreadCount = NotificationData.getUnreadCount(currentUserId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +72,46 @@ class UserHome extends StatelessWidget {
                         if (!ok) return;
                       }
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const MessagePage()),
-                      );
+                        MaterialPageRoute(builder: (_) => const UserNotificationsPage()),
+                      ).then((_) => _loadNotificationCount());
                     },
-                    child: Container(
-                      width: 45,
-                      height: 45,
-                      child: Icon(Icons.message, color: Colors.white, size: 20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Color(0xFFFB959F)
-                      ),
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 45,
+                          height: 45,
+                          child: Icon(Icons.notifications, color: Colors.white, size: 20),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Color(0xFFFB959F)
+                          ),
+                        ),
+                        if (unreadCount > 0)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              constraints: BoxConstraints(
+                                minWidth: 20,
+                                minHeight: 20,
+                              ),
+                              child: Text(
+                                unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   )
                 ],
