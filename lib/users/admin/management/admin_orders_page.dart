@@ -133,10 +133,14 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Đơn hàng #${order.id}',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Expanded(
+                  child: Text(
+                    'Đơn hàng #${order.id}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
+                SizedBox(width: 8),
                 _buildStatusChip(order.status),
               ],
             ),
@@ -163,7 +167,12 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
               children: [
                 Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
                 SizedBox(width: 8),
-                Expanded(child: Text('Địa chỉ: ${order.address}')),
+                Expanded(
+                  child: Text(
+                    'Địa chỉ: ${order.address}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             SizedBox(height: 12),
@@ -176,7 +185,13 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${item.product.name} x${item.quantity}${item.selectedSize != null ? ' (${item.selectedSize})' : ''}'),
+                  Expanded(
+                    child: Text(
+                      '${item.product.name} x${item.quantity}${item.selectedSize != null ? ' (${item.selectedSize})' : ''}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(width: 8),
                   Text('${item.totalPrice.toStringAsFixed(0)} đ'),
                 ],
               ),

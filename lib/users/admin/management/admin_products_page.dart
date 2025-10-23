@@ -122,14 +122,7 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () async {
-                              await ProductData.deleteProduct(p.id);
-                              setState(() {});
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Đã xóa ${p.name}')),
-                              );
-                            },
+                            onPressed: () => _showDeleteConfirmation(context, p),
                           ),
                         ],
                       ),
@@ -361,6 +354,78 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
         );
       },
     );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, Product product) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Xác nhận xóa sản phẩm'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Bạn có chắc chắn muốn xóa sản phẩm này không?'),
+              const SizedBox(height: 8),
+              Text(
+                'Tên: ${product.name}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text('Danh mục: ${product.category}'),
+              Text('Giá: ${product.price.toStringAsFixed(0)} đ'),
+              const SizedBox(height: 8),
+              const Text(
+                'Hành động này không thể hoàn tác!',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteProduct(context, product);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Xóa'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteProduct(BuildContext context, Product product) async {
+    try {
+      await ProductData.deleteProduct(product.id);
+      if (!mounted) return;
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Đã xóa sản phẩm "${product.name}"'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi khi xóa sản phẩm: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
 
