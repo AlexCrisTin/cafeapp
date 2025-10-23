@@ -147,6 +147,22 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
 
     XFile? selectedImage;
     String? imagePath = product?.imagePath;
+    
+    // Biến cho loại sản phẩm và size
+    String productType = 'food'; // 'food' hoặc 'drink'
+    Map<String, double> sizePrices = {};
+    final TextEditingController sPriceController = TextEditingController();
+    final TextEditingController mPriceController = TextEditingController();
+    final TextEditingController lPriceController = TextEditingController();
+    
+    // Khởi tạo giá trị từ product hiện tại
+    if (product != null && product.hasSize) {
+      productType = 'drink';
+      sizePrices = product.sizePrices ?? {};
+      sPriceController.text = sizePrices['S']?.toStringAsFixed(0) ?? '';
+      mPriceController.text = sizePrices['M']?.toStringAsFixed(0) ?? '';
+      lPriceController.text = sizePrices['L']?.toStringAsFixed(0) ?? '';
+    }
 
     await showDialog(
       context: context,
@@ -161,7 +177,28 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: 'Tên sản phẩm'),
+                      decoration: InputDecoration(
+                        labelText: 'Tên sản phẩm',
+                        helperText: 'Tên sản phẩm phải duy nhất',
+                        helperStyle: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                      onChanged: (value) {
+                        // Real-time validation
+                        final trimmedName = value.trim();
+                        if (trimmedName.isNotEmpty) {
+                          final existingProducts = ProductData.getAllProducts();
+                          final isDuplicate = existingProducts.any((p) => 
+                            p.name.toLowerCase() == trimmedName.toLowerCase() && 
+                            p.id != idController.text
+                          );
+                          
+                          if (isDuplicate) {
+                            setStateDialog(() {
+                              // Có thể thêm visual indicator ở đây nếu cần
+                            });
+                          }
+                        }
+                      },
                     ),
                     TextField(
                       controller: priceController,
@@ -172,6 +209,118 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                       controller: categoryController,
                       decoration: const InputDecoration(labelText: 'Danh mục'),
                     ),
+                    const SizedBox(height: 16),
+                    
+                    // Chọn loại sản phẩm
+                    const Text(
+                      'Loại sản phẩm',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: const Text('Đồ ăn'),
+                            value: 'food',
+                            groupValue: productType,
+                            onChanged: (String? value) {
+                              setStateDialog(() {
+                                productType = value!;
+                                // Xóa size prices khi chọn đồ ăn
+                                sizePrices.clear();
+                                sPriceController.clear();
+                                mPriceController.clear();
+                                lPriceController.clear();
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: const Text('Đồ uống'),
+                            value: 'drink',
+                            groupValue: productType,
+                            onChanged: (String? value) {
+                              setStateDialog(() {
+                                productType = value!;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    // Nhập size cho đồ uống
+                    if (productType == 'drink') ...[
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Giá theo size (VNĐ)',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: sPriceController,
+                              decoration: const InputDecoration(
+                                labelText: 'Size S',
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) {
+                                final price = double.tryParse(value);
+                                if (price != null) {
+                                  sizePrices['S'] = price;
+                                } else {
+                                  sizePrices.remove('S');
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: TextField(
+                              controller: mPriceController,
+                              decoration: const InputDecoration(
+                                labelText: 'Size M',
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) {
+                                final price = double.tryParse(value);
+                                if (price != null) {
+                                  sizePrices['M'] = price;
+                                } else {
+                                  sizePrices.remove('M');
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: TextField(
+                              controller: lPriceController,
+                              decoration: const InputDecoration(
+                                labelText: 'Size L',
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) {
+                                final price = double.tryParse(value);
+                                if (price != null) {
+                                  sizePrices['L'] = price;
+                                } else {
+                                  sizePrices.remove('L');
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    
                     const SizedBox(height: 16),
                     const Text(
                       'Chọn ảnh sản phẩm',
@@ -273,6 +422,63 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                       );
                       return;
                     }
+                    
+                    // Kiểm tra tên sản phẩm trùng lặp
+                    final existingProducts = ProductData.getAllProducts();
+                    final duplicateProduct = existingProducts.firstWhere(
+                      (p) => p.name.toLowerCase() == name.toLowerCase() && p.id != idController.text,
+                      orElse: () => Product(
+                        id: '',
+                        name: '',
+                        description: '',
+                        price: 0,
+                        imagePath: '',
+                        category: '',
+                      ),
+                    );
+                    
+                    if (duplicateProduct.id.isNotEmpty) {
+                      // Tìm sản phẩm tương tự để gợi ý
+                      final similarProducts = existingProducts.where((p) => 
+                        p.name.toLowerCase().contains(name.toLowerCase()) || 
+                        name.toLowerCase().contains(p.name.toLowerCase())
+                      ).take(3).toList();
+                      
+                      String suggestionText = 'Tên sản phẩm "$name" đã tồn tại.';
+                      if (similarProducts.isNotEmpty) {
+                        suggestionText += '\n\nSản phẩm tương tự:';
+                        for (var similar in similarProducts) {
+                          suggestionText += '\n• ${similar.name} (${similar.category})';
+                        }
+                        suggestionText += '\n\nVui lòng chọn tên khác.';
+                      } else {
+                        suggestionText += ' Vui lòng chọn tên khác.';
+                      }
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(suggestionText),
+                          backgroundColor: Colors.orange,
+                          duration: Duration(seconds: 4),
+                          action: SnackBarAction(
+                            label: 'Đóng',
+                            textColor: Colors.white,
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            },
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+                    
+                    // Validation cho đồ uống
+                    if (productType == 'drink' && sizePrices.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Vui lòng nhập ít nhất một size cho đồ uống')),
+                      );
+                      return;
+                    }
 
                     final String finalImagePath = selectedImage?.path ?? imagePath ?? '';
 
@@ -283,6 +489,8 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                       price: price,
                       imagePath: finalImagePath,
                       category: category,
+                      hasSize: productType == 'drink',
+                      sizePrices: productType == 'drink' && sizePrices.isNotEmpty ? sizePrices : null,
                     );
 
                     if (isEdit) {
@@ -294,6 +502,22 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                     if (!mounted) return;
                     Navigator.of(ctx).pop();
                     setState(() {});
+                    
+                    // Hiển thị thông báo thành công
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(isEdit ? 'Đã cập nhật sản phẩm "$name"' : 'Đã thêm sản phẩm "$name"'),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 2),
+                        action: SnackBarAction(
+                          label: 'Đóng',
+                          textColor: Colors.white,
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          },
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC586D), foregroundColor: Colors.white),
                   child: Text(isEdit ? 'Lưu' : 'Thêm'),

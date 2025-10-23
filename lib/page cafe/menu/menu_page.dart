@@ -10,13 +10,34 @@ class MenuPage extends StatefulWidget {
   State<MenuPage> createState() => _MenuPageState();
 }
 
-class _MenuPageState extends State<MenuPage> {
+class _MenuPageState extends State<MenuPage> with WidgetsBindingObserver {
   List<Product> allProducts = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadProducts();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadProducts();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh products when returning to this page
     _loadProducts();
   }
 
@@ -137,11 +158,20 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                         SizedBox(width: 8),
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             setState(() {
                               isLoading = true;
                             });
-                            _loadProducts();
+                            await _loadProducts();
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Đã cập nhật danh sách sản phẩm'),
+                                  duration: Duration(seconds: 1),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
                           },
                           child: Icon(
                             Icons.refresh,

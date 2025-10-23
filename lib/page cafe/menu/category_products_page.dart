@@ -43,7 +43,11 @@ class CategoryProductsPage extends StatelessWidget {
                   ),
                   title: Text(product.name),
                   subtitle: Text(product.category),
-                  trailing: Text('${product.price.toStringAsFixed(0)} đ'),
+                  trailing: Text(
+                    product.hasSize && product.sizePrices != null && product.sizePrices!.containsKey('S')
+                      ? '${product.sizePrices!['S']!.toStringAsFixed(0)} đ'
+                      : '${product.price.toStringAsFixed(0)} đ'
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(

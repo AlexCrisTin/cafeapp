@@ -129,7 +129,11 @@ class _item1State extends State<item1> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              product != null ? '${product.price.toStringAsFixed(0)} đ' : '',
+                              product != null 
+                                ? product.hasSize && product.sizePrices != null && product.sizePrices!.containsKey('S')
+                                  ? '${product.sizePrices!['S']!.toStringAsFixed(0)} đ'
+                                  : '${product.price.toStringAsFixed(0)} đ'
+                                : '',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFDC586D)),
                             ),
                             ElevatedButton.icon(

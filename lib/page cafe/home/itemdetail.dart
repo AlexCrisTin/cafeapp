@@ -17,9 +17,22 @@ class ItemDetailPage extends StatefulWidget {
 class _ItemDetailPageState extends State<ItemDetailPage> {
   String? selectedSize;
 
+  @override
+  void initState() {
+    super.initState();
+    // Tự động chọn size S làm mặc định cho đồ uống
+    if (widget.product.hasSize && widget.product.sizePrices != null && widget.product.sizePrices!.containsKey('S')) {
+      selectedSize = 'S';
+    }
+  }
+
   double _getCurrentPrice() {
     if (selectedSize != null && widget.product.hasSize) {
       return widget.product.getPriceForSize(selectedSize!);
+    }
+    // Hiển thị giá size S làm mặc định cho đồ uống
+    if (widget.product.hasSize && widget.product.sizePrices != null && widget.product.sizePrices!.containsKey('S')) {
+      return widget.product.sizePrices!['S']!;
     }
     return widget.product.price;
   }

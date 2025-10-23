@@ -4,6 +4,7 @@ import 'package:cafeproject/database/data/orders_service.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/database/auth/navigation_helper.dart';
 import 'package:cafeproject/users/admin/management/management.dart';
+import 'package:cafeproject/users/user/profile/setting.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -192,8 +193,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   Icons.settings,
                   Colors.grey,
                   () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Tính năng đang phát triển')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SettingsPage()),
                     );
                   },
                 ),

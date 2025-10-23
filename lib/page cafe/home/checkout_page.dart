@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/cart_service.dart';
 import 'package:cafeproject/database/data/orders_service.dart';
+import 'package:cafeproject/database/data/default_address_service.dart';
 import 'package:cafeproject/database/auth/navigation_helper.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -19,6 +20,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final TextEditingController _cardExpiryController = TextEditingController();
 
   String _payment = 'card';
+  String _addressOption = 'new'; // 'new' or 'default'
+  Map<String, String>? _defaultAddress;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDefaultAddress();
+  }
 
   @override
   void dispose() {
@@ -29,6 +39,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
     _cardCvvController.dispose();
     _cardExpiryController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadDefaultAddress() async {
+    final address = await DefaultAddressService.getDefaultAddress();
+    if (address != null) {
+      setState(() {
+        _defaultAddress = address;
+        _addressOption = 'default';
+        _nameController.text = address['name'] ?? '';
+        _phoneController.text = address['phone'] ?? '';
+        _addressController.text = address['address'] ?? '';
+      });
+    }
   }
 
   @override
@@ -57,8 +80,54 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Điền thông tin', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    Text('Thông tin giao hàng', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     SizedBox(height: 16),
+                    
+                    // Address option selection
+                    if (_defaultAddress != null) ...[
+                      Text('Chọn địa chỉ giao hàng', style: TextStyle(fontWeight: FontWeight.w600)),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: RadioListTile<String>(
+                              value: 'default',
+                              groupValue: _addressOption,
+                              onChanged: (value) {
+                                setState(() {
+                                  _addressOption = value!;
+                                  _nameController.text = _defaultAddress!['name'] ?? '';
+                                  _phoneController.text = _defaultAddress!['phone'] ?? '';
+                                  _addressController.text = _defaultAddress!['address'] ?? '';
+                                });
+                              },
+                              title: Text('Địa chỉ mặc định', style: TextStyle(fontSize: 14)),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ),
+                          Expanded(
+                            child: RadioListTile<String>(
+                              value: 'new',
+                              groupValue: _addressOption,
+                              onChanged: (value) {
+                                setState(() {
+                                  _addressOption = value!;
+                                  _nameController.clear();
+                                  _phoneController.clear();
+                                  _addressController.clear();
+                                });
+                              },
+                              title: Text('Địa chỉ mới', style: TextStyle(fontSize: 14)),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                    
+                    Text('Thông tin người nhận', style: TextStyle(fontWeight: FontWeight.w600)),
+                    SizedBox(height: 8),
                     TextField(
                       controller: _nameController,
                       decoration: InputDecoration(
@@ -195,7 +264,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               Container(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: _isLoading ? null : () async {
                     if (_nameController.text.trim().isEmpty ||
                         _phoneController.text.trim().isEmpty ||
                         _addressController.text.trim().isEmpty) {
@@ -234,19 +303,29 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       }
                     }
                     
-                    // Tạo đơn hàng
-                    await OrdersService.createOrder(
-                      name: _nameController.text.trim(),
-                      phone: _phoneController.text.trim(),
-                      address: _addressController.text.trim(),
-                      payment: _payment,
-                      cartItems: CartService.items,
-                    );
-                    await CartService.clear();
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => NavigationHelper.getHomePage()),
-                      (route) => false,
-                    );
+                    setState(() => _isLoading = true);
+                    
+                    try {
+                      // Tạo đơn hàng
+                      await OrdersService.createOrder(
+                        name: _nameController.text.trim(),
+                        phone: _phoneController.text.trim(),
+                        address: _addressController.text.trim(),
+                        payment: _payment,
+                        cartItems: CartService.items,
+                      );
+                      await CartService.clear();
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => NavigationHelper.getHomePage()),
+                        (route) => false,
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Có lỗi xảy ra khi tạo đơn hàng')),
+                      );
+                    } finally {
+                      setState(() => _isLoading = false);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFDC586D),
@@ -254,7 +333,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     padding: EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text('Mua', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  child: _isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text('Mua', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],

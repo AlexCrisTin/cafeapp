@@ -9,6 +9,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _notificationsEnabled = true;
+  String _selectedLanguage = 'vi';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +34,34 @@ class _SettingsPageState extends State<SettingsPage> {
                         activeColor: Color(0xFFDC586D),
                       ),
                     ),
+                    ListTile(
+                    leading: const Icon(Icons.language),
+                    title: const Text('Ngôn ngữ'),
+                    subtitle: const Text('Chọn ngôn ngữ hiển thị'),
+                    trailing: DropdownButton<String>(
+                      value: _selectedLanguage,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedLanguage = value ?? 'vi';
+                        });
+                      },
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'vi',
+                          child: Text('Tiếng Việt'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'en',
+                          child: Text('English'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListTile(
+                        leading: Icon(Icons.info),
+                        title: Text('Phiên bản'),
+                        subtitle: Text('7.2.7'),
+                      ),
         ],
       ),
     );

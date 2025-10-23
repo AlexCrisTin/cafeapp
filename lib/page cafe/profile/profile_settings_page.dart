@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
+import 'package:cafeproject/page cafe/profile/default_address_page.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
   const ProfileSettingsPage({super.key});
@@ -198,8 +199,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       subtitle: Text('Thiết lập địa chỉ giao hàng'),
                       trailing: Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Tính năng sẽ được phát triển sớm')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DefaultAddressPage(),
+                          ),
                         );
                       },
                     ),
