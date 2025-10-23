@@ -129,7 +129,7 @@ class ProductData {
       description: 'Matcha ngọt ngào, kết hợp hoàn hảo giữa vị đắng của trà và vị ngọt của sữa',
       price: 20000,
       imagePath: 'assets/img/Matcha.jpg',
-      category: 'Matcha',
+      category: 'Trà',
       hasSize: true,
       sizePrices: {'S': 20000, 'M': 25000, 'L': 30000},
     ),

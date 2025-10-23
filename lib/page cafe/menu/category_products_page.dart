@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/product_data.dart';
+import 'package:cafeproject/database/img/image_helper.dart';
 import 'package:cafeproject/page%20cafe/home/itemdetail.dart';
 
 class CategoryProductsPage extends StatelessWidget {
@@ -32,18 +33,11 @@ class CategoryProductsPage extends StatelessWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(7),
-                      child: Image.asset(
+                      child: ImageHelper.buildImage(
                         product.imagePath,
+                        width: 48,
+                        height: 48,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[300],
-                            child: const Icon(
-                              Icons.image_not_supported,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
                       ),
                     ),
                   ),

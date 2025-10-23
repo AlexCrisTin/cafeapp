@@ -43,6 +43,7 @@ class _VoucherState extends State<Voucher> {
               desc: 'Áp dụng đồ uống',
               colors: [Color(0xFF84FAB0), Color(0xFF8FD3F4)],
             ),
+            
           ],
         ),
       ),
@@ -123,6 +124,7 @@ class _VoucherState extends State<Voucher> {
                   ),
                   child: Text('Dùng ngay'),
                 ),
+                
               ],
             ),
           ),
