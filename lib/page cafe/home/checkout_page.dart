@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/cart_service.dart';
 import 'package:cafeproject/database/data/orders_service.dart';
 import 'package:cafeproject/database/data/default_address_service.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:cafeproject/database/auth/navigation_helper.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -12,6 +13,7 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
+  final AuthService _auth = AuthService.instance;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -42,15 +44,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Future<void> _loadDefaultAddress() async {
-    final address = await DefaultAddressService.getDefaultAddress();
-    if (address != null) {
-      setState(() {
-        _defaultAddress = address;
-        _addressOption = 'default';
-        _nameController.text = address['name'] ?? '';
-        _phoneController.text = address['phone'] ?? '';
-        _addressController.text = address['address'] ?? '';
-      });
+    final userId = _auth.currentUser?.email;
+    if (userId != null) {
+      final address = await DefaultAddressService.getDefaultAddress(userId);
+      if (address != null) {
+        setState(() {
+          _defaultAddress = address;
+          _addressOption = 'default';
+          _nameController.text = address['name'] ?? '';
+          _phoneController.text = address['phone'] ?? '';
+          _addressController.text = address['address'] ?? '';
+        });
+      }
     }
   }
 

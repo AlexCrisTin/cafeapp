@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/default_address_service.dart';
+import 'package:cafeproject/database/auth/auth_service.dart';
 
 class DefaultAddressPage extends StatefulWidget {
   const DefaultAddressPage({super.key});
@@ -9,6 +10,7 @@ class DefaultAddressPage extends StatefulWidget {
 }
 
 class _DefaultAddressPageState extends State<DefaultAddressPage> {
+  final AuthService _auth = AuthService.instance;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -31,14 +33,17 @@ class _DefaultAddressPageState extends State<DefaultAddressPage> {
   }
 
   Future<void> _loadDefaultAddress() async {
-    final address = await DefaultAddressService.getDefaultAddress();
-    if (address != null) {
-      setState(() {
-        _nameController.text = address['name'] ?? '';
-        _phoneController.text = address['phone'] ?? '';
-        _addressController.text = address['address'] ?? '';
-        _hasDefaultAddress = true;
-      });
+    final userId = _auth.currentUser?.email;
+    if (userId != null) {
+      final address = await DefaultAddressService.getDefaultAddress(userId);
+      if (address != null) {
+        setState(() {
+          _nameController.text = address['name'] ?? '';
+          _phoneController.text = address['phone'] ?? '';
+          _addressController.text = address['address'] ?? '';
+          _hasDefaultAddress = true;
+        });
+      }
     }
   }
 
@@ -55,11 +60,15 @@ class _DefaultAddressPageState extends State<DefaultAddressPage> {
     setState(() => _isLoading = true);
 
     try {
-      await DefaultAddressService.saveDefaultAddress(
-        name: _nameController.text.trim(),
-        phone: _phoneController.text.trim(),
-        address: _addressController.text.trim(),
-      );
+      final userId = _auth.currentUser?.email;
+      if (userId != null) {
+        await DefaultAddressService.saveDefaultAddress(
+          userId: userId,
+          name: _nameController.text.trim(),
+          phone: _phoneController.text.trim(),
+          address: _addressController.text.trim(),
+        );
+      }
 
       setState(() => _hasDefaultAddress = true);
 
@@ -98,7 +107,10 @@ class _DefaultAddressPageState extends State<DefaultAddressPage> {
       setState(() => _isLoading = true);
 
       try {
-        await DefaultAddressService.clearDefaultAddress();
+        final userId = _auth.currentUser?.email;
+        if (userId != null) {
+          await DefaultAddressService.clearDefaultAddress(userId);
+        }
         setState(() {
           _nameController.clear();
           _phoneController.clear();
