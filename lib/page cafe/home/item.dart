@@ -12,6 +12,20 @@ class Item extends StatefulWidget {
 }
 
 class _ItemState extends State<Item> {
+  List<Product> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  void _loadProducts() {
+    setState(() {
+      products = ProductData.getAllProducts();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -20,11 +34,17 @@ class _ItemState extends State<Item> {
           alignment: Alignment.centerLeft,
           padding: EdgeInsets.only(top: 10, left: 10),
           child: Text('Gợi ý cho bạn', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-          
         ),
-        item1(productId: '1'),
-        item1(productId: '2'),
-        item1(productId: '3'),  
+        // Hiển thị 3 sản phẩm đầu tiên
+        if (products.isNotEmpty)
+          ...products.take(3).map((product) => item1(productId: product.id)).toList()
+        else
+          Container(
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: Text('Đang tải sản phẩm...', style: TextStyle(color: Colors.grey[600])),
+            ),
+          ),
       ],
     );
   }

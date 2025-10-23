@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class Product {
   final String id;
@@ -61,10 +62,15 @@ class ProductData {
   static List<Product> products = [];
   static const String _fileName = 'products_data.json';
 
+  // Helper function để tạo UUID cho sản phẩm mặc định
+  static String _generateDefaultId() {
+    return const Uuid().v4();
+  }
+
   // Dữ liệu sản phẩm mặc định
   static final List<Product> _defaultProducts = [
     Product(
-      id: '1',
+      id: _generateDefaultId(),
       name: 'Cà phê đen',
       description: 'Cà phê đen truyền thống, đậm đà và thơm ngon. Pha từ hạt cà phê Robusta chất lượng cao.',
       price: 25000,
@@ -74,7 +80,7 @@ class ProductData {
       sizePrices: {'S': 25000, 'M': 30000, 'L': 35000},
     ),
     Product(
-      id: '2',
+      id: _generateDefaultId(),
       name: 'Cà phê sữa',
       description: 'Cà phê sữa ngọt ngào, kết hợp hoàn hảo giữa vị đắng của cà phê và vị ngọt của sữa.',
       price: 30000,
@@ -84,7 +90,7 @@ class ProductData {
       sizePrices: {'S': 30000, 'M': 35000, 'L': 40000},
     ),
     Product(
-      id: '3',
+      id: _generateDefaultId(),
       name: 'Trà sữa trân châu',
       description: 'Trà sữa thơm ngon với trân châu dai dai, một thức uống yêu thích của giới trẻ.',
       price: 35000,
@@ -94,7 +100,7 @@ class ProductData {
       sizePrices: {'S': 35000, 'M': 40000, 'L': 45000},
     ),
     Product(
-      id: '4',
+      id: _generateDefaultId(),
       name: 'Bánh mì sandwich',
       description: 'Bánh mì sandwich tươi ngon với thịt nguội, rau xanh và sốt mayonnaise.',
       price: 40000,
@@ -102,7 +108,7 @@ class ProductData {
       category: 'Đồ ăn ngọt',
     ),
     Product(
-      id: '5',
+      id: _generateDefaultId(),
       name: 'Bánh ngọt',
       description: 'Bánh ngọt tươi ngon, được làm từ nguyên liệu cao cấp, thích hợp cho bữa sáng.',
       price: 20000,
@@ -110,7 +116,7 @@ class ProductData {
       category: 'Đồ ăn ngọt',
     ),
     Product(
-      id: '6',
+      id: _generateDefaultId(),
       name: 'Xúc xích',
       description: 'Xúc xích tươi ngon, được làm từ nguyên liệu cao cấp, thích hợp cho ăn vặt.',
       price: 20000,
@@ -118,7 +124,7 @@ class ProductData {
       category: 'Đồ ăn mặn',
     ),
     Product(
-      id: '7',
+      id: _generateDefaultId(),
       name: 'Matcha',
       description: 'Matcha ngọt ngào, kết hợp hoàn hảo giữa vị đắng của trà và vị ngọt của sữa',
       price: 20000,

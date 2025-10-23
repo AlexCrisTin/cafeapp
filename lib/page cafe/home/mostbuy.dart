@@ -11,6 +11,20 @@ class Mostbuy extends StatefulWidget {
 }
 
 class _MostbuyState extends State<Mostbuy> {
+  List<Product> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  void _loadProducts() {
+    setState(() {
+      products = ProductData.getAllProducts();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -23,104 +37,50 @@ class _MostbuyState extends State<Mostbuy> {
           ),
           SizedBox(
             height: 130,
-            child: PageView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                final product = ProductData.getProductById('${index + 1}');
-                return Container(
-                  padding: EdgeInsets.only(left: 20, right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          if (product != null) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => ItemDetailPage(product: product),
+            child: products.isEmpty 
+              ? Center(child: Text('Đang tải sản phẩm...', style: TextStyle(color: Colors.grey[600])))
+              : PageView.builder(
+                  itemCount: (products.length / 3).ceil(), // Mỗi trang hiển thị 3 sản phẩm
+                  itemBuilder: (context, pageIndex) {
+                    final startIndex = pageIndex * 3;
+                    final endIndex = (startIndex + 3).clamp(0, products.length);
+                    final pageProducts = products.sublist(startIndex, endIndex);
+                    return Container(
+                      padding: EdgeInsets.only(left: 20, right: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: pageProducts.map((product) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => ItemDetailPage(product: product),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(6),                    
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
                               ),
-                            );
-                          }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(6),                    
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.red, width: 2),
-                              image: ImageHelper.buildDecorationImage(product?.imagePath),
-                            ),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          if (product != null) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => ItemDetailPage(product: product),
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.red, width: 2),
+                                  image: ImageHelper.buildDecorationImage(product.imagePath),
+                                ),
                               ),
-                            );
-                          }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.red, width: 2),
-                              image: ImageHelper.buildDecorationImage(product?.imagePath),
                             ),
-                          ),
-                        ),
+                          );
+                        }).toList(),
                       ),
-                      InkWell(
-                        onTap: () {
-                          if (product != null) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => ItemDetailPage(product: product),
-                              ),
-                            );
-                          }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.red, width: 2),
-                              image: ImageHelper.buildDecorationImage(product?.imagePath),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
           )
         ],
       ),

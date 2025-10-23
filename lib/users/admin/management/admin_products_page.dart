@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cafeproject/database/data/product_data.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 
 class AdminProductsPage extends StatefulWidget {
   const AdminProductsPage({super.key});
@@ -145,7 +146,7 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
 
   Future<void> _openProductForm(BuildContext context, {Product? product}) async {
     final bool isEdit = product != null;
-    final TextEditingController idController = TextEditingController(text: product?.id ?? DateTime.now().millisecondsSinceEpoch.toString());
+    final TextEditingController idController = TextEditingController(text: product?.id ?? const Uuid().v4());
     final TextEditingController nameController = TextEditingController(text: product?.name ?? '');
     final TextEditingController priceController = TextEditingController(text: product != null ? product.price.toStringAsFixed(0) : '');
     final TextEditingController categoryController = TextEditingController(text: product?.category ?? '');

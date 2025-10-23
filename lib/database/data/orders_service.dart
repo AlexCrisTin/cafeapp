@@ -4,6 +4,7 @@ import 'package:cafeproject/database/data/cart_service.dart';
 import 'package:cafeproject/database/data/product_data.dart';
 import 'package:cafeproject/database/auth/auth_service.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 enum OrderStatus { pending, confirmed, completed }
 
@@ -181,7 +182,7 @@ class OrdersService {
       userId = null; // guest order
     }
     final order = Order(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: const Uuid().v4(),
       userId: userId,
       customerName: name,
       phone: phone,

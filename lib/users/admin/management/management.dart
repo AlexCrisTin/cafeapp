@@ -173,7 +173,7 @@ class _AdminManagementState extends State<AdminManagement> {
 
   /*Future<void> _openProductForm(BuildContext context, {Product? product}) async {
     final isEdit = product != null;
-    final idController = TextEditingController(text: product?.id ?? DateTime.now().millisecondsSinceEpoch.toString());
+    final idController = TextEditingController(text: product?.id ?? const Uuid().v4());
     final nameController = TextEditingController(text: product?.name ?? '');
     final priceController = TextEditingController(text: product != null ? product.price.toStringAsFixed(0) : '');
     final categoryController = TextEditingController(text: product?.category ?? '');

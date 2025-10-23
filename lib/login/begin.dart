@@ -68,7 +68,7 @@ class _BeginState extends State<Begin> {
                         ),
                       ),
                       Text(
-                        'Cafe App',
+                        'Lowsky',
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
