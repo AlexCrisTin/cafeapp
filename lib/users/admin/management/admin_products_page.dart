@@ -501,6 +501,8 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
 
                     if (!mounted) return;
                     Navigator.of(ctx).pop();
+                    
+                    // Force refresh UI
                     setState(() {});
                     
                     // Hiển thị thông báo thành công

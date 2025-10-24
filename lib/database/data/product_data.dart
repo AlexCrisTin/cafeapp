@@ -142,8 +142,9 @@ class ProductData {
       final file = File('${directory.path}/$_fileName');
       final jsonData = products.map((product) => product.toJson()).toList();
       await file.writeAsString(jsonEncode(jsonData));
+      print('💾 Đã lưu ${products.length} sản phẩm vào file');
     } catch (e) {
-      print('Lỗi khi lưu sản phẩm: $e');
+      print('❌ Lỗi khi lưu sản phẩm: $e');
     }
   }
 
@@ -185,6 +186,9 @@ class ProductData {
     if (index >= 0) {
       products[index] = product;
       await _saveToFile();
+      print('✅ Đã cập nhật sản phẩm: ${product.name}');
+    } else {
+      print('❌ Không tìm thấy sản phẩm với ID: ${product.id}');
     }
   }
 

@@ -2,6 +2,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:cafeproject/database/data/orders_service.dart';
+import 'package:cafeproject/database/data/cart_service.dart';
+import 'package:cafeproject/database/data/user_profile_service.dart';
+import 'package:cafeproject/database/data/default_address_service.dart';
+import 'package:cafeproject/database/data/notification_data.dart';
 
 enum UserRole { user, admin, guest }
 
@@ -100,9 +105,72 @@ class AuthService {
     final key = username.trim().toLowerCase();
     if (!_users.containsKey(key)) return false;
     if (key == 'admin') return false; // protect default admin
-    _users.remove(key);
-    await _saveToFile();
-    return true;
+    
+    try {
+      // Xóa toàn bộ dữ liệu liên quan đến user
+      await _deleteUserRelatedData(key);
+      
+      // Xóa user khỏi hệ thống
+      _users.remove(key);
+      await _saveToFile();
+      
+      return true;
+    } catch (e) {
+      print('Lỗi khi xóa user $key: $e');
+      return false;
+    }
+  }
+
+  // Xóa toàn bộ dữ liệu liên quan đến user
+  Future<void> _deleteUserRelatedData(String userId) async {
+    // 1. Xóa đơn hàng của user
+    await _deleteUserOrders(userId);
+    
+    // 2. Xóa giỏ hàng của user
+    await _deleteUserCart(userId);
+    
+    // 3. Xóa thông tin profile
+    await UserProfileService.clearUserProfile(userId);
+    
+    // 4. Xóa địa chỉ mặc định
+    await DefaultAddressService.clearDefaultAddress(userId);
+    
+    // 5. Xóa thông báo của user
+    await _deleteUserNotifications(userId);
+  }
+
+  // Xóa đơn hàng của user
+  Future<void> _deleteUserOrders(String userId) async {
+    try {
+      // Sử dụng OrdersService để lấy và xóa đơn hàng
+      final userOrders = OrdersService.getOrdersByUser(userId);
+      
+      for (final order in userOrders) {
+        await OrdersService.deleteOrder(order.id);
+      }
+    } catch (e) {
+      print('Lỗi khi xóa đơn hàng của user $userId: $e');
+    }
+  }
+
+  // Xóa giỏ hàng của user
+  Future<void> _deleteUserCart(String userId) async {
+    try {
+      // Sử dụng phương thức mới trong CartService
+      await CartService.clearUserCart(userId);
+    } catch (e) {
+      print('Lỗi khi xóa giỏ hàng của user $userId: $e');
+    }
+  }
+
+  // Xóa thông báo của user
+  Future<void> _deleteUserNotifications(String userId) async {
+    try {
+      // Sử dụng phương thức mới trong NotificationData
+      await NotificationData.deleteUserNotifications(userId);
+    } catch (e) {
+      print('Lỗi khi xóa thông báo của user $userId: $e');
+    }
   }
 
   Future<bool> setUserRole(String username, UserRole role) async {

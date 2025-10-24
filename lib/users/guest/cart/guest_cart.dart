@@ -38,7 +38,7 @@ class GuestCart extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Hãy thêm sản phẩm vào giỏ hàng',
+                    'Hãy đăng nhập để thêm sản phẩm vào giỏ hàng',
                     style: TextStyle(
                       color: Colors.grey[500],
                     ),

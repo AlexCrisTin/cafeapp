@@ -168,6 +168,12 @@ class NotificationData {
     }
   }
 
+  // Xóa tất cả thông báo của user cụ thể (dành cho admin)
+  static Future<void> deleteUserNotifications(String userId) async {
+    notifications.removeWhere((notification) => notification.userId == userId);
+    await _saveToFile();
+  }
+
   // Tạo thông báo cho đơn hàng
   static Future<void> createOrderNotification({
     required String userId,

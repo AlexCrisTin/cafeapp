@@ -206,6 +206,14 @@ class CartService {
       await _saveToFile();
     }
   }
+
+  // Xóa giỏ hàng của user cụ thể (dành cho admin)
+  static Future<void> clearUserCart(String userId) async {
+    if (_userCarts.containsKey(userId)) {
+      _userCarts.remove(userId);
+      await _saveToFile();
+    }
+  }
 }
 
 
